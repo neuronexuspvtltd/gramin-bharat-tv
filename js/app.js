@@ -750,8 +750,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle Online Form Submission
   if (sarpanchForm) {
-    sarpanchForm.addEventListener("submit", (e) => {
+    sarpanchForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      
+      const submitBtn = sarpanchForm.querySelector("button[type='submit']");
+      const origBtnHtml = submitBtn ? submitBtn.innerHTML : "";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>नोंदणी व फाइल्स सेव्ह होत आहेत...</span>`;
+      }
       
       const photoEl = document.getElementById("upload-sarpanch-photo");
       const idProofEl = document.getElementById("upload-id-proof");
@@ -806,8 +813,9 @@ document.addEventListener("DOMContentLoaded", () => {
         certificates: certEl?.files?.[0] || null
       };
 
+      let savedRecord = registrationData;
       if (window.gbtvFirebase && typeof window.gbtvFirebase.saveRegistration === "function") {
-        window.gbtvFirebase.saveRegistration(registrationData, fileMap);
+        savedRecord = await window.gbtvFirebase.saveRegistration(registrationData, fileMap);
       } else {
         try {
           const stored = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
@@ -818,20 +826,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      lastSubmittedRegData = registrationData;
+      lastSubmittedRegData = savedRecord || registrationData;
 
       // Close registration form modal
       closeNamdarModal();
 
       // Show confirmation toast with Registration ID
-      showToast(`✅ नोंदणी यशस्वी झाली! अधिकृत अर्ज डाउनलोड होत आहे... (नोंदणी क्र: ${registrationId})`);
+      showToast(`✅ नोंदणी यशस्वी झाली! अर्ज डाउनलोड होत आहे... (नोंदणी क्र: ${registrationId})`);
       
       // Auto-trigger Download / Print of the submitted application PDF immediately
       setTimeout(() => {
-        printOrDownloadApplicationForm(registrationData);
+        printOrDownloadApplicationForm(lastSubmittedRegData);
       }, 350);
 
       sarpanchForm.reset();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origBtnHtml;
+      }
       fileUploadInputs.forEach(item => {
         const statusEl = document.getElementById(item.statusId);
         const box = document.getElementById(item.inputId)?.closest(".doc-upload-box");

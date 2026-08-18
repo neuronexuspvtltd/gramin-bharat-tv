@@ -1,6 +1,6 @@
 /**
- * Gramin Bharat TV - Robust Firebase Cloud Integration Layer
- * Provides Cloud Firestore real-time sync, Base64 & Storage image processing, and LocalStorage failover.
+ * Gramin Bharat TV - Firebase Cloud Integration Layer
+ * Direct Firebase Storage file uploads, Cloud Firestore real-time sync, and LocalStorage failover.
  */
 
 (function (window) {
@@ -77,7 +77,7 @@
 
       isInitialized = true;
       lastError = null;
-      console.log("🔥 Firebase initialized for project:", config.projectId);
+      console.log("🔥 Firebase & Storage initialized for project:", config.projectId);
       return true;
     } catch (err) {
       console.error("Firebase init error:", err);
@@ -87,7 +87,53 @@
     }
   }
 
-  // Fast client-side image compressor to Base64 (100% immune to CORS, instant Firestore & LocalStorage storage)
+  // Direct Firebase Storage File Uploader
+  async function uploadFileToFirebaseStorage(file, folderPath) {
+    if (!file) return null;
+
+    if (!firebaseStorage && firebase && firebase.storage) {
+      try {
+        firebaseStorage = firebase.storage();
+      } catch (e) {}
+    }
+
+    if (!isInitialized || !firebaseStorage) {
+      console.warn("Firebase Storage not available, using fallback.");
+      return null;
+    }
+
+    try {
+      const cleanFileName = (file.name || "file").replace(/[^a-zA-Z0-9._-]/g, "_");
+      const fullPath = `${folderPath}/${Date.now()}_${cleanFileName}`;
+      const storageRef = firebaseStorage.ref().child(fullPath);
+
+      const metadata = {
+        contentType: file.type || "application/octet-stream",
+        customMetadata: {
+          originalName: file.name || "upload",
+          uploadedAt: new Date().toISOString()
+        }
+      };
+
+      console.log(`📤 Uploading to Firebase Storage: ${fullPath} (${Math.round(file.size / 1024)} KB)...`);
+      const uploadTask = await storageRef.put(file, metadata);
+      const downloadUrl = await uploadTask.ref.getDownloadURL();
+      console.log(`✅ Upload success! Firebase Storage URL:`, downloadUrl);
+      
+      return {
+        url: downloadUrl,
+        path: fullPath,
+        name: file.name,
+        size: file.size,
+        type: file.type
+      };
+    } catch (err) {
+      console.warn("Firebase Storage upload notice (will use local fallback):", err.message || err);
+      return null;
+    }
+  }
+
+  // Client-side image compressor fallback
   function convertImageToBase64(file, maxWidth = 800, quality = 0.7) {
     return new Promise((resolve) => {
       if (!file) {
@@ -95,7 +141,6 @@
         return;
       }
       if (!file.type || !file.type.startsWith("image/")) {
-        // Non-image file (e.g. PDF), read as plain data URL if < 1MB
         if (file.size < 1024 * 1024) {
           const reader = new FileReader();
           reader.onload = (e) => resolve(e.target.result);
@@ -138,63 +183,76 @@
         reader.onerror = () => resolve(null);
         reader.readAsDataURL(file);
       } catch (err) {
-        console.warn("Base64 conversion notice:", err);
         resolve(null);
       }
     });
   }
 
-  // Optional background upload to Firebase Storage with timeout
-  async function uploadFileWithTimeout(file, path, timeoutMs = 4000) {
-    if (!isInitialized || !firebaseStorage || !file) return null;
-    return new Promise(async (resolve) => {
-      const timer = setTimeout(() => resolve(null), timeoutMs);
-      try {
-        const storageRef = firebaseStorage.ref().child(path);
-        const snapshot = await storageRef.put(file);
-        const downloadUrl = await snapshot.ref.getDownloadURL();
-        clearTimeout(timer);
-        resolve(downloadUrl);
-      } catch (err) {
-        clearTimeout(timer);
-        resolve(null);
-      }
-    });
-  }
-
-  // Save registration with guaranteed persistence (Firestore + LocalStorage + Base64 Photos)
+  // Save registration with Firebase Storage Uploads & Cloud Firestore Persistence
   async function saveRegistration(regData, fileMap = {}) {
     const record = { ...regData };
     const uploadedDocs = { ...record.documentsAttached };
+    const regRefId = regData.regId || `REG-${Date.now()}`;
 
-    // 1. Process files into optimized Base64 immediately (instant & infallible)
+    // 1. Upload files to Firebase Storage
     try {
+      // 1.1 Sarpanch Photo
       if (fileMap.sarpanchPhoto) {
-        const b64 = await convertImageToBase64(fileMap.sarpanchPhoto, 600, 0.75);
-        if (b64) uploadedDocs.sarpanchPhotoUrl = b64;
-      }
-      if (fileMap.idProof) {
-        const b64 = await convertImageToBase64(fileMap.idProof, 800, 0.75);
-        if (b64) uploadedDocs.idProofUrl = b64;
-      }
-      if (fileMap.certificates) {
-        const b64 = await convertImageToBase64(fileMap.certificates, 800, 0.75);
-        if (b64) uploadedDocs.certificatesUrl = b64;
-      }
-      if (fileMap.worksPhotos && fileMap.worksPhotos.length > 0) {
-        uploadedDocs.worksPhotosUrls = [];
-        for (let i = 0; i < Math.min(fileMap.worksPhotos.length, 3); i++) {
-          const b64 = await convertImageToBase64(fileMap.worksPhotos[i], 800, 0.7);
-          if (b64) uploadedDocs.worksPhotosUrls.push(b64);
+        const storageResult = await uploadFileToFirebaseStorage(fileMap.sarpanchPhoto, `sarpanch_uploads/${regRefId}/photos`);
+        if (storageResult && storageResult.url) {
+          uploadedDocs.sarpanchPhotoUrl = storageResult.url;
+          uploadedDocs.sarpanchPhotoStoragePath = storageResult.path;
+        } else {
+          const b64 = await convertImageToBase64(fileMap.sarpanchPhoto, 600, 0.75);
+          if (b64) uploadedDocs.sarpanchPhotoUrl = b64;
         }
       }
-    } catch (procErr) {
-      console.warn("File processing notice:", procErr);
+
+      // 1.2 ID Proof
+      if (fileMap.idProof) {
+        const storageResult = await uploadFileToFirebaseStorage(fileMap.idProof, `sarpanch_uploads/${regRefId}/id_proofs`);
+        if (storageResult && storageResult.url) {
+          uploadedDocs.idProofUrl = storageResult.url;
+          uploadedDocs.idProofStoragePath = storageResult.path;
+        } else {
+          const b64 = await convertImageToBase64(fileMap.idProof, 800, 0.75);
+          if (b64) uploadedDocs.idProofUrl = b64;
+        }
+      }
+
+      // 1.3 Works Photos
+      if (fileMap.worksPhotos && fileMap.worksPhotos.length > 0) {
+        uploadedDocs.worksPhotosUrls = [];
+        for (let i = 0; i < fileMap.worksPhotos.length; i++) {
+          const f = fileMap.worksPhotos[i];
+          const storageResult = await uploadFileToFirebaseStorage(f, `sarpanch_uploads/${regRefId}/works`);
+          if (storageResult && storageResult.url) {
+            uploadedDocs.worksPhotosUrls.push(storageResult.url);
+          } else {
+            const b64 = await convertImageToBase64(f, 800, 0.7);
+            if (b64) uploadedDocs.worksPhotosUrls.push(b64);
+          }
+        }
+      }
+
+      // 1.4 Certificates
+      if (fileMap.certificates) {
+        const storageResult = await uploadFileToFirebaseStorage(fileMap.certificates, `sarpanch_uploads/${regRefId}/certificates`);
+        if (storageResult && storageResult.url) {
+          uploadedDocs.certificatesUrl = storageResult.url;
+          uploadedDocs.certificatesStoragePath = storageResult.path;
+        } else {
+          const b64 = await convertImageToBase64(fileMap.certificates, 800, 0.75);
+          if (b64) uploadedDocs.certificatesUrl = b64;
+        }
+      }
+    } catch (uploadErr) {
+      console.warn("Storage upload pipeline notice:", uploadErr);
     }
 
     record.documentsAttached = uploadedDocs;
 
-    // 2. Save directly to LocalStorage first (0ms, 100% reliable)
+    // 2. Save directly to LocalStorage
     try {
       const localList = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
       const existingIdx = localList.findIndex(r => r.id === record.id || r.regId === record.regId);
@@ -204,7 +262,6 @@
         localList.unshift(record);
       }
       localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(localList));
-      console.log("✓ Registration saved locally:", record.regId);
     } catch (e) {
       console.warn("LocalStorage save notice:", e);
     }
@@ -216,7 +273,7 @@
           ...record,
           serverTimestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        console.log("✓ Registration successfully written to Cloud Firestore ID:", docRef.id);
+        console.log("✓ Registration written to Cloud Firestore ID:", docRef.id);
         record.firestoreDocId = docRef.id;
 
         // Update local mirror with doc ID
@@ -227,25 +284,8 @@
           localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(localList));
         }
       } catch (err) {
-        console.warn("Firestore write notice (data safely preserved locally):", err.message || err);
+        console.warn("Firestore write notice (data safely saved locally):", err.message || err);
       }
-    }
-
-    // 4. Background Storage upload (non-blocking)
-    if (isInitialized && firebaseStorage && fileMap) {
-      const regRefId = regData.regId || `REG-${Date.now()}`;
-      (async () => {
-        try {
-          if (fileMap.sarpanchPhoto) {
-            const url = await uploadFileWithTimeout(fileMap.sarpanchPhoto, `sarpanch_uploads/${regRefId}/photo_${fileMap.sarpanchPhoto.name}`);
-            if (url && record.firestoreDocId && firestoreDb) {
-              firestoreDb.collection(COLLECTION_REGISTRATIONS).doc(record.firestoreDocId).update({
-                "documentsAttached.sarpanchPhotoUrl": url
-              }).catch(() => {});
-            }
-          }
-        } catch (e) {}
-      })();
     }
 
     return record;
@@ -402,6 +442,7 @@
     saveConfig: saveConfig,
     clearConfig: clearConfig,
     testConnection: testConnection,
+    uploadFile: uploadFileToFirebaseStorage,
     saveRegistration: saveRegistration,
     listenRegistrations: listenRegistrations,
     deleteRegistration: deleteRegistration,
