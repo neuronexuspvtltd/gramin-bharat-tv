@@ -1,12 +1,11 @@
 /**
- * Gramin Bharat TV - Firebase Cloud Integration Layer
- * Provides Cloud Firestore real-time sync, Firebase Storage uploads, and LocalStorage fallback.
+ * Gramin Bharat TV - Robust Firebase Cloud Integration Layer
+ * Provides Cloud Firestore real-time sync, Firebase Storage uploads, and LocalStorage failover.
  */
 
 (function (window) {
   "use strict";
 
-  // Default Firebase configuration (can be updated dynamically from Admin Panel)
   const DEFAULT_CONFIG = {
     apiKey: "AIzaSyD98PCS75kiEBAwM-bDVb4cQTudvKA__nA",
     authDomain: "gramin-bharat-tv-20e13.firebaseapp.com",
@@ -25,6 +24,7 @@
   let firestoreDb = null;
   let firebaseStorage = null;
   let isInitialized = false;
+  let lastError = null;
 
   function getStoredConfig() {
     try {
@@ -55,6 +55,7 @@
 
     if (typeof firebase === "undefined") {
       console.warn("Firebase SDK not loaded from CDN.");
+      isInitialized = false;
       return false;
     }
 
@@ -71,10 +72,12 @@
       }
 
       isInitialized = true;
-      console.log("🔥 Firebase successfully initialized for project:", config.projectId);
+      lastError = null;
+      console.log("🔥 Firebase initialized for project:", config.projectId);
       return true;
     } catch (err) {
       console.error("Firebase init error:", err);
+      lastError = err;
       isInitialized = false;
       return false;
     }
@@ -97,7 +100,7 @@
         path: path
       };
     } catch (err) {
-      console.warn("Firebase Storage upload failed (falling back to metadata):", err);
+      console.warn("Firebase Storage upload notice (using local metadata):", err.message || err);
       return {
         name: file.name,
         size: file.size,
@@ -107,12 +110,27 @@
     }
   }
 
-  // Save registration to Cloud Firestore and upload attached files
+  // Save registration to Cloud Firestore and mirror to LocalStorage
   async function saveRegistration(regData, fileMap = {}) {
     const record = { ...regData };
     const uploadedDocs = { ...record.documentsAttached };
 
-    // Upload files if storage is active
+    // 1. Immediately guarantee local persistence
+    try {
+      const localList = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+      const existingIdx = localList.findIndex(r => r.id === record.id || r.regId === record.regId);
+      if (existingIdx >= 0) {
+        localList[existingIdx] = record;
+      } else {
+        localList.unshift(record);
+      }
+      localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(localList));
+      console.log("✓ Registration saved to LocalStorage:", record.regId);
+    } catch (e) {
+      console.warn("LocalStorage save error:", e);
+    }
+
+    // 2. Upload files if storage is active
     if (isInitialized && firebaseStorage && fileMap) {
       const regRefId = regData.regId || `REG-${Date.now()}`;
       
@@ -138,33 +156,32 @@
           if (res && res.url) uploadedDocs.certificatesUrl = res.url;
         }
       } catch (uploadErr) {
-        console.warn("File upload notice:", uploadErr);
+        console.warn("File upload warning:", uploadErr);
       }
 
       record.documentsAttached = uploadedDocs;
     }
 
-    // Save to Cloud Firestore
+    // 3. Save to Cloud Firestore
     if (isInitialized && firestoreDb) {
       try {
         const docRef = await firestoreDb.collection(COLLECTION_REGISTRATIONS).add({
           ...record,
           serverTimestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        console.log("✓ Registration written to Cloud Firestore with ID:", docRef.id);
+        console.log("✓ Registration written to Cloud Firestore ID:", docRef.id);
         record.firestoreDocId = docRef.id;
-      } catch (err) {
-        console.error("Failed to write to Cloud Firestore (falling back to LocalStorage):", err);
-      }
-    }
 
-    // Always mirror to LocalStorage
-    try {
-      const localList = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
-      localList.unshift(record);
-      localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(localList));
-    } catch (e) {
-      console.warn("LocalStorage mirror error:", e);
+        // Update local record with firestoreDocId
+        const localList = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+        const idx = localList.findIndex(r => r.id === record.id || r.regId === record.regId);
+        if (idx >= 0) {
+          localList[idx].firestoreDocId = docRef.id;
+          localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(localList));
+        }
+      } catch (err) {
+        console.warn("Firestore write error (data remains safe in LocalStorage):", err.message || err);
+      }
     }
 
     return record;
@@ -172,37 +189,52 @@
 
   // Real-time listener for Sarpanch Registrations (for Admin Panel)
   function listenRegistrations(onUpdate, onError) {
+    // 1. Immediately provide local data first
+    const local = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+    onUpdate(local, false);
+
     if (!isInitialized || !firestoreDb) {
-      const local = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
-      onUpdate(local, false);
       return () => {};
     }
 
     try {
       return firestoreDb.collection(COLLECTION_REGISTRATIONS)
-        .orderBy("id", "desc")
         .onSnapshot(snapshot => {
-          const list = [];
+          const cloudList = [];
           snapshot.forEach(doc => {
-            list.push({ firestoreDocId: doc.id, ...doc.data() });
+            cloudList.push({ firestoreDocId: doc.id, ...doc.data() });
           });
-          localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(list));
-          onUpdate(list, true);
+
+          // Sort by id descending
+          cloudList.sort((a, b) => (b.id || 0) - (a.id || 0));
+
+          // Merge with any local submissions not yet synced
+          const currentLocal = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+          const merged = [...cloudList];
+          
+          currentLocal.forEach(localItem => {
+            const existsInCloud = merged.some(c => c.id === localItem.id || (c.regId && c.regId === localItem.regId));
+            if (!existsInCloud) {
+              merged.push(localItem);
+            }
+          });
+
+          merged.sort((a, b) => (b.id || 0) - (a.id || 0));
+          localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(merged));
+          onUpdate(merged, cloudList.length > 0);
         }, err => {
-          console.error("Firestore registrations listener error:", err);
+          console.warn("Firestore registrations onSnapshot notice:", err.message || err);
           if (onError) onError(err);
-          const local = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
-          onUpdate(local, false);
+          const fallbackLocal = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+          onUpdate(fallbackLocal, false);
         });
     } catch (e) {
-      console.warn("Listener setup error:", e);
-      const local = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
-      onUpdate(local, false);
+      console.warn("Listener init error:", e);
       return () => {};
     }
   }
 
-  // Delete registration from Firestore
+  // Delete registration from Firestore & LocalStorage
   async function deleteRegistration(regId, firestoreDocId = null) {
     if (isInitialized && firestoreDb) {
       try {
@@ -213,13 +245,12 @@
           snapshot.forEach(doc => doc.ref.delete());
         }
       } catch (err) {
-        console.error("Firestore delete error:", err);
+        console.warn("Firestore delete error:", err.message || err);
       }
     }
 
-    // Local mirror delete
     let list = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
-    list = list.filter(r => r.id != regId && r.firestoreDocId != firestoreDocId);
+    list = list.filter(r => r.id != regId && (!firestoreDocId || r.firestoreDocId != firestoreDocId));
     localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(list));
   }
 
@@ -233,10 +264,9 @@
         }, { merge: true });
         console.log("✓ CMS Store synced to Cloud Firestore");
       } catch (err) {
-        console.error("Firestore CMS save error:", err);
+        console.warn("Firestore CMS save error:", err.message || err);
       }
     }
-    // Always mirror to LocalStorage
     localStorage.setItem("GBTV_CMS_DATA_STORE_V1", JSON.stringify(cmsData));
   }
 
@@ -259,7 +289,7 @@
           if (local) onUpdate(local, false);
         }
       }, err => {
-        console.warn("CMS listener fallback to local:", err);
+        console.warn("CMS listener fallback to local:", err.message || err);
         const local = JSON.parse(localStorage.getItem("GBTV_CMS_DATA_STORE_V1") || "null");
         if (local) onUpdate(local, false);
       });
@@ -292,13 +322,11 @@
     }
   }
 
-  // Save config from Admin Panel
   function saveConfig(config) {
     localStorage.setItem(STORAGE_KEY_FIREBASE_CONFIG, JSON.stringify(config));
     return initFirebase(config);
   }
 
-  // Clear config
   function clearConfig() {
     localStorage.removeItem(STORAGE_KEY_FIREBASE_CONFIG);
     isInitialized = false;
@@ -308,6 +336,7 @@
   window.gbtvFirebase = {
     init: initFirebase,
     isConfigured: () => isInitialized,
+    getLastError: () => lastError,
     getConfig: getStoredConfig,
     saveConfig: saveConfig,
     clearConfig: clearConfig,

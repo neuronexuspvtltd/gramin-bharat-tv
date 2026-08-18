@@ -110,6 +110,48 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 4000);
   }
 
+  function renderRegistrationsTable(registrations, isCloud = false) {
+    const regTable = document.getElementById("table-registrations-body");
+    if (!regTable) return;
+
+    if (!registrations || registrations.length === 0) {
+      regTable.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--admin-text-dim); padding: 30px;">अद्याप कोणतीही नोंदणी प्राप्त झालेली नाही. (No registrations received yet.)</td></tr>`;
+      return;
+    }
+
+    regTable.innerHTML = registrations.map((reg) => `
+      <tr>
+        <td style="font-size: 0.75rem; color: var(--admin-text-muted);">${reg.submittedAt || '-'}</td>
+        <td style="font-weight: 700; color: var(--admin-text-main);">
+          ${reg.fullName}
+          ${reg.documentsAttached?.sarpanchPhotoUrl ? `<a href="${reg.documentsAttached.sarpanchPhotoUrl}" target="_blank" title="View Uploaded Photo" style="margin-left: 6px; color: #ea580c; font-size: 0.8rem;"><i class="fas fa-image"></i></a>` : ''}
+        </td>
+        <td>
+          <a href="tel:${reg.mobile}" style="color: var(--admin-info); text-decoration: none; display: block; font-weight: 600;">📞 ${reg.mobile}</a>
+          <a href="https://wa.me/${(reg.whatsapp || '').replace(/[^0-9]/g, '')}" target="_blank" style="color: var(--admin-success); font-size: 0.76rem; text-decoration: none;">💬 WA: ${reg.whatsapp}</a>
+        </td>
+        <td>
+          <strong>${reg.village}</strong>, ${reg.taluka}, ${reg.district}
+        </td>
+        <td>
+          <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; background: ${reg.isCurrentSarpanch === 'होय' ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)'}; color: ${reg.isCurrentSarpanch === 'होय' ? 'var(--admin-success)' : 'var(--admin-warning)'};">
+            ${reg.isCurrentSarpanch === 'होय' ? 'सध्या कार्यरत' : 'माजी सरपंच'}
+          </span>
+          ${isCloud || reg.firestoreDocId ? '<span style="display: block; font-size: 0.65rem; color: #16a34a; margin-top: 2px;">☁️ Cloud Synced</span>' : '<span style="display: block; font-size: 0.65rem; color: #d97706; margin-top: 2px;">💾 Local Storage</span>'}
+        </td>
+        <td>
+          <div class="table-action-btns">
+            <button class="btn-tbl-action btn-tbl-pdf" onclick="printRegistrationPDF(${reg.id})" title="Download User Form as PDF" style="color: #ea580c; border-color: #fdba74; background: #fff7ed;">
+              <i class="fas fa-file-pdf"></i>
+            </button>
+            <button class="btn-tbl-action" onclick="viewRegistrationDetail(${reg.id})" title="View Details"><i class="fas fa-eye"></i></button>
+            <button class="btn-tbl-action btn-tbl-delete" onclick="deleteRegistration(${reg.id}, '${reg.firestoreDocId || ''}')" title="Delete Entry"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
   // =========================================================================
   // 4. LOAD & RENDER CMS DATA
   // =========================================================================
@@ -289,41 +331,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 8.5 Sarpanch Registrations Table
-    const regTable = document.getElementById("table-registrations-body");
-    if (regTable) {
-      const registrations = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
-      if (registrations.length === 0) {
-        regTable.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--admin-text-dim); padding: 30px;">अद्याप कोणतीही नोंदणी प्राप्त झालेली नाही. (No registrations received yet.)</td></tr>`;
-      } else {
-        regTable.innerHTML = registrations.map((reg) => `
-          <tr>
-            <td style="font-size: 0.75rem; color: var(--admin-text-muted);">${reg.submittedAt || '-'}</td>
-            <td style="font-weight: 700; color: var(--admin-text-main);">${reg.fullName}</td>
-            <td>
-              <a href="tel:${reg.mobile}" style="color: var(--admin-info); text-decoration: none; display: block; font-weight: 600;">📞 ${reg.mobile}</a>
-              <a href="https://wa.me/${(reg.whatsapp || '').replace(/[^0-9]/g, '')}" target="_blank" style="color: var(--admin-success); font-size: 0.76rem; text-decoration: none;">💬 WA: ${reg.whatsapp}</a>
-            </td>
-            <td>
-              <strong>${reg.village}</strong>, ${reg.taluka}, ${reg.district}
-            </td>
-            <td>
-              <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; background: ${reg.isCurrentSarpanch === 'होय' ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)'}; color: ${reg.isCurrentSarpanch === 'होय' ? 'var(--admin-success)' : 'var(--admin-warning)'};">
-                ${reg.isCurrentSarpanch === 'होय' ? 'सध्या कार्यरत' : 'माजी सरपंच'}
-              </span>
-            </td>
-            <td>
-              <div class="table-action-btns">
-                <button class="btn-tbl-action" onclick="printRegistrationPDF(${reg.id})" title="Download User Form as PDF" style="color: #ea580c; border-color: #fdba74; background: #fff7ed;">
-                  <i class="fas fa-file-pdf"></i>
-                </button>
-                <button class="btn-tbl-action" onclick="viewRegistrationDetail(${reg.id})" title="View Details"><i class="fas fa-eye"></i></button>
-                <button class="btn-tbl-action btn-tbl-delete" onclick="deleteRegistration(${reg.id})" title="Delete Entry"><i class="fas fa-trash-alt"></i></button>
-              </div>
-            </td>
-          </tr>
-        `).join("");
-      }
-    }
+    const registrations = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+    renderRegistrationsTable(registrations, false);
 
     // 9. Contact Info Form
     if (data.brand) {
@@ -1405,44 +1414,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Setup real-time listener for registrations
   if (window.gbtvFirebase && typeof window.gbtvFirebase.listenRegistrations === "function") {
     window.gbtvFirebase.listenRegistrations((registrations, isCloud) => {
-      const regTable = document.getElementById("table-registrations-body");
-      if (regTable) {
-        if (!registrations || registrations.length === 0) {
-          regTable.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--admin-text-dim); padding: 30px;">अद्याप कोणतीही नोंदणी प्राप्त झालेली नाही. (No registrations received yet.)</td></tr>`;
-        } else {
-          regTable.innerHTML = registrations.map((reg) => `
-            <tr>
-              <td style="font-size: 0.75rem; color: var(--admin-text-muted);">${reg.submittedAt || '-'}</td>
-              <td style="font-weight: 700; color: var(--admin-text-main);">
-                ${reg.fullName}
-                ${reg.documentsAttached?.sarpanchPhotoUrl ? `<a href="${reg.documentsAttached.sarpanchPhotoUrl}" target="_blank" title="View Uploaded Photo" style="margin-left: 6px; color: #ea580c; font-size: 0.8rem;"><i class="fas fa-image"></i></a>` : ''}
-              </td>
-              <td>
-                <a href="tel:${reg.mobile}" style="color: var(--admin-info); text-decoration: none; display: block; font-weight: 600;">📞 ${reg.mobile}</a>
-                <a href="https://wa.me/${(reg.whatsapp || '').replace(/[^0-9]/g, '')}" target="_blank" style="color: var(--admin-success); font-size: 0.76rem; text-decoration: none;">💬 WA: ${reg.whatsapp}</a>
-              </td>
-              <td>
-                <strong>${reg.village}</strong>, ${reg.taluka}, ${reg.district}
-              </td>
-              <td>
-                <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; background: ${reg.isCurrentSarpanch === 'होय' ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)'}; color: ${reg.isCurrentSarpanch === 'होय' ? 'var(--admin-success)' : 'var(--admin-warning)'};">
-                  ${reg.isCurrentSarpanch === 'होय' ? 'सध्या कार्यरत' : 'माजी सरपंच'}
-                </span>
-                ${isCloud ? '<span style="display: block; font-size: 0.65rem; color: #16a34a; margin-top: 2px;">☁️ Cloud Synced</span>' : ''}
-              </td>
-              <td>
-                <div class="table-action-btns">
-                  <button class="btn-tbl-action btn-tbl-pdf" onclick="printRegistrationPDF(${reg.id})" title="Download User Form as PDF" style="color: #ea580c; border-color: #fdba74; background: #fff7ed;">
-                    <i class="fas fa-file-pdf"></i>
-                  </button>
-                  <button class="btn-tbl-action" onclick="viewRegistrationDetail(${reg.id})" title="View Details"><i class="fas fa-eye"></i></button>
-                  <button class="btn-tbl-action btn-tbl-delete" onclick="deleteRegistration(${reg.id}, '${reg.firestoreDocId || ''}')" title="Delete Entry"><i class="fas fa-trash-alt"></i></button>
-                </div>
-              </td>
-            </tr>
-          `).join("");
-        }
-      }
+      renderRegistrationsTable(registrations, isCloud);
     });
   }
 
