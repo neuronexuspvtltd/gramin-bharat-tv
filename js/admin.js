@@ -884,39 +884,90 @@ document.addEventListener("DOMContentLoaded", () => {
         <title>नामदार महाराष्ट्राचा - अधिकृत नोंदणी अर्ज (${data.fullName})</title>
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800;900&display=swap" rel="stylesheet">
         <style>
+          @page {
+            size: A4 portrait;
+            margin: 8mm 10mm 6mm 10mm;
+          }
           * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans Devanagari', -apple-system, sans-serif; }
-          body { background: #ffffff; color: #0f172a; padding: 24px; font-size: 13px; line-height: 1.4; }
-          .form-header { border: 2px solid #ea580c; border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; background: #fff7ed; display: flex; align-items: center; justify-content: space-between; }
-          .header-left h1 { font-size: 18px; font-weight: 900; color: #c2410c; margin-bottom: 2px; }
-          .header-left h2 { font-size: 14px; font-weight: 800; color: #0f172a; }
-          .header-left p { font-size: 11px; color: #475569; }
+          html, body { background: #ffffff; color: #0f172a; font-size: 11px; line-height: 1.3; }
+          body { padding: 4px; }
+          
+          .form-header { 
+            border: 1.5px solid #ea580c; 
+            border-radius: 8px; 
+            padding: 8px 12px; 
+            margin-bottom: 6px; 
+            background: #fff7ed; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+          }
+          .header-left p { font-size: 9.5px; color: #c2410c; font-weight: 700; }
+          .header-left h1 { font-size: 16px; font-weight: 900; color: #c2410c; line-height: 1.1; margin: 1px 0; }
+          .header-left h2 { font-size: 11px; font-weight: 800; color: #0f172a; }
           .header-right { text-align: right; }
-          .reg-badge { display: inline-block; background: #ea580c; color: #ffffff; font-weight: 800; padding: 4px 10px; border-radius: 6px; font-size: 12px; }
-          .reg-date { font-size: 10px; color: #64748b; margin-top: 3px; }
-          .prize-strip { background: linear-gradient(90deg, #fef3c7 0%, #ffedd5 100%); border: 1px solid #f59e0b; border-radius: 8px; padding: 8px 12px; margin-bottom: 14px; text-align: center; font-weight: 800; font-size: 11px; color: #b45309; }
+          .reg-badge { display: inline-block; background: #ea580c; color: #ffffff; font-weight: 800; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; }
+          .reg-date { font-size: 9.5px; color: #64748b; margin-top: 2px; }
           
-          .form-section { border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 12px; overflow: hidden; page-break-inside: avoid; }
-          .section-title { background: #f1f5f9; padding: 6px 12px; font-size: 12px; font-weight: 800; color: #0f172a; border-bottom: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: space-between; }
+          .prize-strip { 
+            background: linear-gradient(90deg, #fef3c7 0%, #ffedd5 100%); 
+            border: 1px solid #f59e0b; 
+            border-radius: 6px; 
+            padding: 4px 8px; 
+            margin-bottom: 6px; 
+            text-align: center; 
+            font-weight: 800; 
+            font-size: 9.5px; 
+            color: #b45309; 
+          }
+          
+          .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+          
+          .form-section { border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; page-break-inside: avoid; }
+          .section-title { background: #f1f5f9; padding: 4px 8px; font-size: 10.5px; font-weight: 800; color: #0f172a; border-bottom: 1px solid #cbd5e1; }
+          
           .data-table { width: 100%; border-collapse: collapse; }
-          .data-table td { padding: 6px 10px; font-size: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+          .data-table td { padding: 3.5px 6px; font-size: 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
           .data-table tr:last-child td { border-bottom: none; }
-          .data-label { width: 28%; font-weight: 700; color: #475569; background: #fafafa; }
-          .data-val { width: 72%; font-weight: 600; color: #0f172a; }
+          .data-label { width: 34%; font-weight: 700; color: #475569; background: #fafafa; }
+          .data-val { width: 66%; font-weight: 600; color: #0f172a; }
           
-          .works-list { padding: 8px 14px 8px 28px; }
-          .works-list li { margin-bottom: 4px; font-size: 12px; }
+          .works-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; padding: 6px 10px; }
+          .work-item { font-size: 10px; font-weight: 600; color: #0f172a; display: flex; gap: 4px; }
+          .work-num { color: #ea580c; font-weight: 800; }
           
-          .declaration-box { background: #fff7ed; border: 1px dashed #fdba74; border-radius: 8px; padding: 10px 14px; font-size: 11px; color: #7c2d12; line-height: 1.45; margin-bottom: 14px; page-break-inside: avoid; }
-          .sign-area { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; padding-top: 14px; border-top: 1px solid #e2e8f0; page-break-inside: avoid; }
-          .sign-box { text-align: center; width: 200px; }
-          .sign-line { border-bottom: 1px solid #0f172a; margin-bottom: 6px; height: 35px; }
-          .sign-lbl { font-size: 11px; font-weight: 700; color: #475569; }
+          .declaration-box { 
+            background: #fff7ed; 
+            border: 1px dashed #fdba74; 
+            border-radius: 6px; 
+            padding: 5px 8px; 
+            font-size: 9.5px; 
+            color: #7c2d12; 
+            line-height: 1.35; 
+            margin-top: 6px; 
+            margin-bottom: 6px; 
+            page-break-inside: avoid; 
+          }
           
-          .form-footer { margin-top: 14px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 8px; }
+          .sign-area { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-end; 
+            padding: 6px 10px; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 6px; 
+            background: #f8fafc; 
+            page-break-inside: avoid; 
+          }
+          .sign-box { text-align: center; width: 180px; }
+          .sign-line { border-bottom: 1px solid #0f172a; margin-bottom: 3px; height: 22px; }
+          .sign-lbl { font-size: 10px; font-weight: 700; color: #475569; }
+          
+          .form-footer { margin-top: 4px; text-align: center; font-size: 8.5px; color: #94a3b8; }
           
           @media print {
             body { padding: 0; }
-            .no-print { display: none; }
+            @page { margin: 6mm 8mm; }
           }
         </style>
       </head>
@@ -925,7 +976,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="header-left">
             <p>🚩 श्रुती फिल्म्स व ग्रामीण भारत टीव्ही प्रस्तुत</p>
             <h1>नामदार महाराष्ट्राचा - सरपंच सन्मान</h1>
-            <h2>अधिकृत नोंदणी अर्ज (Official Registration Form)</h2>
+            <h2>अधिकृत नोंदणी अर्ज (Official Registration Application)</h2>
           </div>
           <div class="header-right">
             <span class="reg-badge">${data.regId || ('GBTV-' + data.id.toString().slice(-6))}</span>
@@ -934,133 +985,147 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
         <div class="prize-strip">
-          🏆 प्रथम बक्षिस: ₹११ लाख + ट्रॅक्टर 🚜 | द्वितीय: ₹७ लाख + ॲम्बुलन्स 🚑 | तृतीय: ₹५ लाख + पिठाची गिरणी 🌾
+          🏆 प्रथम: ₹११ लाख + ट्रॅक्टर 🚜 | द्वितीय: ₹७ लाख + ॲम्बुलन्स 🚑 | तृतीय: ₹५ लाख + पिठाची गिरणी 🌾
         </div>
 
-        <!-- Section 1 -->
-        <div class="form-section">
-          <div class="section-title">१. वैयक्तिक माहिती (Personal Details)</div>
+        <!-- Row 1: Personal & Village Details side-by-side -->
+        <div class="grid-2col">
+          <!-- Section 1 -->
+          <div class="form-section">
+            <div class="section-title">१. वैयक्तिक माहिती (Personal Details)</div>
+            <table class="data-table">
+              <tr>
+                <td class="data-label">सरपंच पूर्ण नाव:</td>
+                <td class="data-val"><strong>${data.fullName}</strong></td>
+              </tr>
+              <tr>
+                <td class="data-label">मोबाईल:</td>
+                <td class="data-val">📞 ${data.mobile}</td>
+              </tr>
+              <tr>
+                <td class="data-label">व्हॉट्सअॅप:</td>
+                <td class="data-val">💬 ${data.whatsapp || '-'}</td>
+              </tr>
+              <tr>
+                <td class="data-label">ईमेल आयडी:</td>
+                <td class="data-val">${data.email || '-'}</td>
+              </tr>
+              <tr>
+                <td class="data-label">शिक्षण / व्यवसाय:</td>
+                <td class="data-val">${data.education || '-'}</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Section 2 -->
+          <div class="form-section">
+            <div class="section-title">२. गावाची माहिती (Village Details)</div>
+            <table class="data-table">
+              <tr>
+                <td class="data-label">गाव व तालुका:</td>
+                <td class="data-val"><strong>${data.village}</strong>, तालुका: ${data.taluka}</td>
+              </tr>
+              <tr>
+                <td class="data-label">जिल्हा व पिनकोड:</td>
+                <td class="data-val">${data.district} - ${data.pincode || '-'}</td>
+              </tr>
+              <tr>
+                <td class="data-label">संपूर्ण पत्ता:</td>
+                <td class="data-val">${data.address || '-'}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Row 2: Tenure & Attached Documents side-by-side -->
+        <div class="grid-2col">
+          <!-- Section 3 -->
+          <div class="form-section">
+            <div class="section-title">३. सरपंच पदाचा कार्यकाळ (Tenure)</div>
+            <table class="data-table">
+              <tr>
+                <td class="data-label">सध्या कार्यरत सरपंच?</td>
+                <td class="data-val"><strong>${data.isCurrentSarpanch}</strong></td>
+              </tr>
+              <tr>
+                <td class="data-label">कार्यकाळ:</td>
+                <td class="data-val">${data.tenureFrom || '-'} ते ${data.tenureTo || '-'}</td>
+              </tr>
+              <tr>
+                <td class="data-label">एकूण कालावधी:</td>
+                <td class="data-val">${data.totalYears || '-'}</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Section 6: Docs -->
+          <div class="form-section">
+            <div class="section-title">४. कागदपत्रे स्थिती (Documents)</div>
+            <table class="data-table">
+              <tr>
+                <td class="data-label">सरपंच फोटो:</td>
+                <td class="data-val">✓ ${data.documentsAttached?.sarpanchPhoto || 'जोडले आहे'}</td>
+              </tr>
+              <tr>
+                <td class="data-label">ओळखपत्र (आधार):</td>
+                <td class="data-val">✓ ${data.documentsAttached?.idProof || 'जोडले आहे'}</td>
+              </tr>
+              <tr>
+                <td class="data-label">विकासकामे / प्रमाणपत्रे:</td>
+                <td class="data-val">✓ ${data.documentsAttached?.worksPhotos ? 'फोटो जोडले' : 'जोडले आहे'}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 4: Key Works (Full Width Compact 2-column list) -->
+        <div class="form-section" style="margin-bottom: 6px;">
+          <div class="section-title">५. गावासाठी केलेली प्रमुख विकासकामे (Key Works Done)</div>
+          <div class="works-grid">
+            ${(data.works && data.works.length > 0)
+              ? data.works.map((w, idx) => `<div class="work-item"><span class="work-num">${idx + 1}.</span> <span>${w}</span></div>`).join("")
+              : '<div class="work-item">कोणतीही कामे नमूद केलेली नाहीत.</div>'}
+          </div>
+        </div>
+
+        <!-- Section 5: Special Initiatives & Awards (Full width) -->
+        <div class="form-section" style="margin-bottom: 6px;">
+          <div class="section-title">६. विशेष कामगिरी, उपक्रम व मिळालेले पुरस्कार (Special Initiatives & Honors)</div>
           <table class="data-table">
             <tr>
-              <td class="data-label">सरपंच पूर्ण नाव:</td>
-              <td class="data-val"><strong>${data.fullName}</strong></td>
-            </tr>
-            <tr>
-              <td class="data-label">मोबाईल व व्हॉट्सअॅप:</td>
-              <td class="data-val">📞 ${data.mobile} | 💬 WhatsApp: ${data.whatsapp || '-'}</td>
-            </tr>
-            <tr>
-              <td class="data-label">ईमेल आयडी:</td>
-              <td class="data-val">${data.email || '-'}</td>
-            </tr>
-            <tr>
-              <td class="data-label">शिक्षण / व्यवसाय:</td>
-              <td class="data-val">${data.education || '-'}</td>
-            </tr>
-          </table>
-        </div>
-
-        <!-- Section 2 -->
-        <div class="form-section">
-          <div class="section-title">२. गावाची माहिती (Village Details)</div>
-          <table class="data-table">
-            <tr>
-              <td class="data-label">गाव व तालुका:</td>
-              <td class="data-val"><strong>${data.village}</strong>, तालुका: ${data.taluka}</td>
-            </tr>
-            <tr>
-              <td class="data-label">जिल्हा व पिनकोड:</td>
-              <td class="data-val">${data.district} - ${data.pincode || '-'}</td>
-            </tr>
-            <tr>
-              <td class="data-label">संपूर्ण पत्ता:</td>
-              <td class="data-val">${data.address || '-'}</td>
-            </tr>
-          </table>
-        </div>
-
-        <!-- Section 3 -->
-        <div class="form-section">
-          <div class="section-title">३. सरपंच पदाची माहिती (Tenure Details)</div>
-          <table class="data-table">
-            <tr>
-              <td class="data-label">सध्या कार्यरत सरपंच?</td>
-              <td class="data-val"><strong>${data.isCurrentSarpanch}</strong></td>
-            </tr>
-            <tr>
-              <td class="data-label">पदाचा कार्यकाळ:</td>
-              <td class="data-val">${data.tenureFrom || '-'} ते ${data.tenureTo || '-'} (एकूण: ${data.totalYears || '-'})</td>
-            </tr>
-          </table>
-        </div>
-
-        <!-- Section 4 -->
-        <div class="form-section">
-          <div class="section-title">४. गावासाठी केलेली प्रमुख विकासकामे (Key Works)</div>
-          <ol class="works-list">
-            ${(data.works && data.works.length > 0) 
-              ? data.works.map(w => `<li>${w}</li>`).join("")
-              : "<li>कोणतीही कामे नमूद केलेली नाहीत.</li>"}
-          </ol>
-        </div>
-
-        <!-- Section 5 & 6 -->
-        <div class="form-section">
-          <div class="section-title">५. विशेष कामगिरी व पुरस्कार (Special Initiatives & Honors)</div>
-          <table class="data-table">
-            <tr>
-              <td class="data-label">विशेष उपक्रम:</td>
+              <td class="data-label" style="width: 20%;">विशेष उपक्रम:</td>
               <td class="data-val">${data.specialInitiatives || 'काही नाही'}</td>
             </tr>
             <tr>
-              <td class="data-label">मिळालेले पुरस्कार:</td>
-              <td class="data-val">${data.awards || 'काही नाही'}</td>
+              <td class="data-label" style="width: 20%;">पुरस्कार / सन्मान:</td>
+              <td class="data-val">🏆 ${data.awards || 'काही नाही'}</td>
             </tr>
           </table>
         </div>
 
-        <!-- Section 7 -->
-        <div class="form-section">
-          <div class="section-title">६. जोडलेली कागदपत्रे (Attached Documents Status)</div>
-          <table class="data-table">
-            <tr>
-              <td class="data-label">सरपंच फोटो:</td>
-              <td class="data-val">✓ ${data.documentsAttached?.sarpanchPhoto || 'जोडले आहे'}</td>
-            </tr>
-            <tr>
-              <td class="data-label">ओळखपत्र (आधार):</td>
-              <td class="data-val">✓ ${data.documentsAttached?.idProof || 'जोडले आहे'}</td>
-            </tr>
-            <tr>
-              <td class="data-label">विकासकामे फोटो:</td>
-              <td class="data-val">✓ ${data.documentsAttached?.worksPhotos || 'जोडले आहे'}</td>
-            </tr>
-            <tr>
-              <td class="data-label">प्रमाणपत्रे:</td>
-              <td class="data-val">✓ ${data.documentsAttached?.certificates || 'जोडले आहे'}</td>
-            </tr>
-          </table>
-        </div>
-
-        <!-- Declaration & Sign -->
+        <!-- Declaration -->
         <div class="declaration-box">
           <strong>घोषणा:</strong> मी याद्वारे घोषित करतो/करते की वर दिलेली सर्व माहिती व कागदपत्रे माझ्या माहितीनुसार सत्य व बरोबर आहेत. मी 'नामदार महाराष्ट्राचा' या शोमध्ये सहभागी होण्यासाठी पूर्णपणे सहमत आहे.
         </div>
 
+        <!-- Signature Area -->
         <div class="sign-area">
           <div class="sign-box">
             <div class="sign-line"></div>
             <div class="sign-lbl">अर्जदार सरपंच स्वाक्षरी</div>
           </div>
+          <div style="text-align: center;">
+            <div style="font-weight: 800; color: #c2410c; font-size: 11px;">ग्रामीण भारत टीव्ही (Gramin Bharat TV)</div>
+            <div style="font-size: 9.5px; color: #64748b;">अधिकृत छाननी व तपासणी कक्ष</div>
+          </div>
           <div class="sign-box" style="text-align: right;">
-            <div style="font-weight: 800; color: #c2410c; font-size: 13px;">ग्रामीण भारत टीव्ही</div>
-            <div style="font-size: 11px; color: #475569;">अधिकृत छाननी व तपासणी कक्ष</div>
-            <div style="font-size: 10px; color: #16a34a; font-weight: 700; margin-top: 4px;">हेल्पलाईन: 9987213141</div>
+            <div style="font-weight: 800; color: #16a34a; font-size: 11px;">हेल्पलाईन: 9987213141</div>
+            <div style="font-size: 9px; color: #475569;">आम्ही येतोय तुमच्या दारी!</div>
           </div>
         </div>
 
         <div class="form-footer">
-          Gramin Bharat TV (ग्रामीण भारत टीव्ही) - Vilas Gadge | अधिकृत संकेतस्थळ: https://graminbharat-tv.com
+          Gramin Bharat TV - Vilas Gadge | अधिकृत संकेतस्थळ: https://graminbharat-tv.com
         </div>
 
         <script>
