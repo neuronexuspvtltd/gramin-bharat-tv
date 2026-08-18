@@ -1180,6 +1180,338 @@
     </div>
   </div>
 
+  <!-- =========================================================================
+       NAMDAR MAHARASHTRACHA REGISTRATION FORM MODAL
+       ========================================================================= -->
+  <div id="namdar-form-modal" class="namdar-form-backdrop">
+    <div class="namdar-form-dialog">
+      <!-- Modal Header -->
+      <div class="namdar-form-header">
+        <div class="header-brand-line">
+          <img src="assets/logo.png" alt="Gramin Bharat TV" class="form-logo-img">
+          <div class="header-titles">
+            <span class="form-sub-tag">ग्रामीण भारत TV प्रस्तुत</span>
+            <h2 class="form-main-heading">नामदार महाराष्ट्राचा <span class="highlight-badge">अधिकृत नोंदणी फॉर्म</span></h2>
+            <p class="form-tagline">तुमच्या कामाची खरी नोंद... तुमच्या गावाचा अभिमान!</p>
+          </div>
+        </div>
+        <button id="namdar-form-close-btn" class="form-close-btn" aria-label="Close Form">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Form + Prize Sidebar) -->
+      <div class="namdar-form-body">
+        <form id="sarpanch-registration-form">
+          <div class="form-layout-grid">
+            
+            <!-- Left Column: Form Fields -->
+            <div class="form-fields-column">
+              
+              <!-- 1. वैयक्तिक माहिती -->
+              <div class="form-section-card">
+                <div class="form-section-head">
+                  <div class="section-num-icon"><i class="fas fa-user"></i></div>
+                  <h3>१. वैयक्तिक माहिती (Personal Details)</h3>
+                </div>
+                <div class="form-inner-grid">
+                  <div class="input-field-wrap field-span-2">
+                    <label>पूर्ण नाव (सरपंच) <span class="req">*</span></label>
+                    <input type="text" id="reg-fullname" placeholder="उदा. मा. श्री./सौ. सरपंच यांचे पूर्ण नाव" required>
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>मोबाईल क्रमांक <span class="req">*</span></label>
+                    <input type="tel" id="reg-mobile" placeholder="उदा. 98XXXXXXXX" pattern="[0-9]{10}" required>
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>व्हॉट्सअॅप क्रमांक <span class="req">*</span></label>
+                    <input type="tel" id="reg-whatsapp" placeholder="उदा. 98XXXXXXXX" pattern="[0-9]{10}" required>
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>ई-मेल (असल्यास)</label>
+                    <input type="email" id="reg-email" placeholder="sarpanch@gmail.com">
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>शिक्षण / व्यवसाय</label>
+                    <input type="text" id="reg-education" placeholder="उदा. पदवीधर / शेतकरी">
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. गावाची माहिती -->
+              <div class="form-section-card">
+                <div class="form-section-head">
+                  <div class="section-num-icon"><i class="fas fa-home"></i></div>
+                  <h3>२. गावाची माहिती (Village Details)</h3>
+                </div>
+                <div class="form-inner-grid">
+                  <div class="input-field-wrap">
+                    <label>गावाचे नाव <span class="req">*</span></label>
+                    <input type="text" id="reg-village" placeholder="गावाचे नाव" required>
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>तालुका <span class="req">*</span></label>
+                    <input type="text" id="reg-taluka" placeholder="तालुका" required>
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>जिल्हा <span class="req">*</span></label>
+                    <input type="text" id="reg-district" placeholder="जिल्हा" required>
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>ग्रामपंचायत पिनकोड</label>
+                    <input type="text" id="reg-pincode" placeholder="उदा. 440001">
+                  </div>
+                  <div class="input-field-wrap field-span-2">
+                    <label>संपूर्ण पत्ता</label>
+                    <input type="text" id="reg-address" placeholder="ग्रामपंचायत कार्यालय संपूर्ण पत्ता">
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. सरपंच पदाची माहिती -->
+              <div class="form-section-card">
+                <div class="form-section-head">
+                  <div class="section-num-icon"><i class="fas fa-chair"></i></div>
+                  <h3>३. सरपंच पदाची माहिती (Tenure Details)</h3>
+                </div>
+                <div class="form-inner-grid">
+                  <div class="input-field-wrap field-span-2">
+                    <label>आपण सध्या सरपंच आहात का? <span class="req">*</span></label>
+                    <div class="radio-options-row">
+                      <label class="custom-radio-label">
+                        <input type="radio" name="reg-is-current" value="होय" checked>
+                        <span>होय (Yes, Currently Active)</span>
+                      </label>
+                      <label class="custom-radio-label">
+                        <input type="radio" name="reg-is-current" value="माजी सरपंच">
+                        <span>माजी सरपंच (Former Sarpanch)</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>कार्यकाळ (पासून)</label>
+                    <input type="text" id="reg-tenure-from" placeholder="उदा. 2021">
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>कार्यकाळ (पर्यंत)</label>
+                    <input type="text" id="reg-tenure-to" placeholder="उदा. 2026 / चालू">
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>एकूण किती वर्षे सरपंच होता/होती?</label>
+                    <input type="text" id="reg-total-years" placeholder="उदा. 5 वर्षे">
+                  </div>
+                  <div class="input-field-wrap">
+                    <label>मागील कोणत्या वर्षी सरपंच होता/होती?</label>
+                    <input type="text" id="reg-prev-years" placeholder="उदा. 2015-2020">
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. गावासाठी केलेली कामे -->
+              <div class="form-section-card">
+                <div class="form-section-head">
+                  <div class="section-num-icon"><i class="fas fa-tools"></i></div>
+                  <h3>४. गावासाठी केलेली प्रमुख कामे (Key Works Done)</h3>
+                </div>
+                <div class="work-inputs-list">
+                  <div class="work-single-row">
+                    <span class="work-idx">१)</span>
+                    <input type="text" id="reg-work-1" placeholder="उदा. गावात २४ तास नळ पाणीपुरवठा योजना व जलसंधारण" required>
+                  </div>
+                  <div class="work-single-row">
+                    <span class="work-idx">२)</span>
+                    <input type="text" id="reg-work-2" placeholder="उदा. जिल्हा परिषद डिजिटल शाळा व ई-लर्निंग सुविधा">
+                  </div>
+                  <div class="work-single-row">
+                    <span class="work-idx">३)</span>
+                    <input type="text" id="reg-work-3" placeholder="उदा. शेतकरी पांदण रस्ते व शेततळे निर्मिती">
+                  </div>
+                  <div class="work-single-row">
+                    <span class="work-idx">४)</span>
+                    <input type="text" id="reg-work-4" placeholder="उदा. महिला बचत गट व सौर ऊर्जा पथदिवे">
+                  </div>
+                  <div class="work-single-row">
+                    <span class="work-idx">५)</span>
+                    <input type="text" id="reg-work-5" placeholder="उदा. ग्राम स्वच्छता, सांडपाणी व्यवस्थापन व वृक्षारोपण">
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. विशेष कामगिरी / उपक्रम -->
+              <div class="form-section-card">
+                <div class="form-section-head">
+                  <div class="section-num-icon"><i class="fas fa-star"></i></div>
+                  <h3>५. विशेष कामगिरी / नाविन्यपूर्ण उपक्रम</h3>
+                </div>
+                <div class="input-field-wrap">
+                  <label>गावासाठी केलेले विशेष उपक्रम / विकासकामे थोडक्यात सांगा:</label>
+                  <textarea id="reg-special-initiatives" rows="3" placeholder="उदा. सौर ऊर्जा ग्राम, मोफत वायफाय, आधुनिक शेती क्लस्टर, आरोग्य शिबिरे..."></textarea>
+                </div>
+              </div>
+
+              <!-- 6. पुरस्कार / सन्मान -->
+              <div class="form-section-card">
+                <div class="form-section-head">
+                  <div class="section-num-icon"><i class="fas fa-trophy"></i></div>
+                  <h3>६. पुरस्कार / सन्मान (असल्यास)</h3>
+                </div>
+                <div class="input-field-wrap">
+                  <input type="text" id="reg-awards" placeholder="उदा. संत गाडगेबाबा ग्रामस्वच्छता पुरस्कार / आदर्श सरपंच गौरव">
+                </div>
+              </div>
+
+              <!-- 7. जोडायची कागदपत्रे व फाइल्स अपलोड -->
+              <div class="form-section-card">
+                <div class="form-section-head">
+                  <div class="section-num-icon"><i class="fas fa-file-upload"></i></div>
+                  <h3>७. कागदपत्रे व फोटो अपलोड करा (Upload Documents)</h3>
+                </div>
+                
+                <div class="doc-upload-grid">
+                  <!-- 1. सरपंच फोटो -->
+                  <div class="doc-upload-box">
+                    <div class="doc-upload-icon"><i class="fas fa-camera"></i></div>
+                    <div class="doc-upload-info">
+                      <label class="doc-label" for="upload-sarpanch-photo">
+                        <strong>१. सरपंच पासपोर्ट फोटो <span class="req">*</span></strong>
+                        <span class="doc-hint">JPG, PNG (Max 5MB)</span>
+                      </label>
+                      <input type="file" id="upload-sarpanch-photo" class="doc-file-input" accept="image/*">
+                      <div class="file-chosen-status" id="status-sarpanch-photo">कोणतीही फाइल निवडलेली नाही</div>
+                    </div>
+                  </div>
+
+                  <!-- 2. ओळखपत्र (आधार/इतर) -->
+                  <div class="doc-upload-box">
+                    <div class="doc-upload-icon"><i class="fas fa-id-card"></i></div>
+                    <div class="doc-upload-info">
+                      <label class="doc-label" for="upload-id-proof">
+                        <strong>२. ओळखपत्र (आधार / मतदान कार्ड) <span class="req">*</span></strong>
+                        <span class="doc-hint">PDF, JPG, PNG</span>
+                      </label>
+                      <input type="file" id="upload-id-proof" class="doc-file-input" accept="image/*,.pdf">
+                      <div class="file-chosen-status" id="status-id-proof">कोणतीही फाइल निवडलेली नाही</div>
+                    </div>
+                  </div>
+
+                  <!-- 3. विकासकामांचे फोटो -->
+                  <div class="doc-upload-box">
+                    <div class="doc-upload-icon"><i class="fas fa-images"></i></div>
+                    <div class="doc-upload-info">
+                      <label class="doc-label" for="upload-works-photos">
+                        <strong>३. विकासकामांचे फोटो</strong>
+                        <span class="doc-hint">गावातील विकासकामांचे फोटो</span>
+                      </label>
+                      <input type="file" id="upload-works-photos" class="doc-file-input" accept="image/*" multiple>
+                      <div class="file-chosen-status" id="status-works-photos">कोणतीही फाइल निवडलेली नाही</div>
+                    </div>
+                  </div>
+
+                  <!-- 4. प्रमाणपत्रे / पुरस्कार -->
+                  <div class="doc-upload-box">
+                    <div class="doc-upload-icon"><i class="fas fa-certificate"></i></div>
+                    <div class="doc-upload-info">
+                      <label class="doc-label" for="upload-certificates">
+                        <strong>४. प्रमाणपत्रे / सन्मानपत्र (असल्यास)</strong>
+                        <span class="doc-hint">PDF किंवा फोटो</span>
+                      </label>
+                      <input type="file" id="upload-certificates" class="doc-file-input" accept="image/*,.pdf">
+                      <div class="file-chosen-status" id="status-certificates">कोणतीही फाइल निवडलेली नाही</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="declaration-box" style="margin-top: 16px;">
+                  <label class="custom-check-label">
+                    <input type="checkbox" id="reg-agree-terms" required checked>
+                    <span><strong>मी दिलेली सर्व माहिती व कागदपत्रे खरी व बरोबर आहेत. मी 'नामदार महाराष्ट्राचा' शोमध्ये सहभागी होण्यासाठी सहमत आहे.</strong></span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Column: Grand Prizes Sidebar & Direct Contact -->
+            <div class="form-sidebar-column">
+              <!-- Grand Prizes Card -->
+              <div class="prizes-showcase-card">
+                <div class="prizes-card-head">
+                  <i class="fas fa-trophy"></i>
+                  <h3>नामदार महाराष्ट्राचा<br><span>★ भव्य बक्षिसे! ★</span></h3>
+                </div>
+
+                <div class="prize-tier-item gold-tier">
+                  <div class="prize-medal">🥇</div>
+                  <div class="prize-info">
+                    <div class="prize-rank">प्रथम बक्षिस</div>
+                    <div class="prize-amount">₹११,००,०००</div>
+                    <div class="prize-bonus">+ गावासाठी ट्रॅक्टर 🚜</div>
+                  </div>
+                </div>
+
+                <div class="prize-tier-item silver-tier">
+                  <div class="prize-medal">🥈</div>
+                  <div class="prize-info">
+                    <div class="prize-rank">द्वितीय बक्षिस</div>
+                    <div class="prize-amount">₹७,००,०००</div>
+                    <div class="prize-bonus">+ गावासाठी ॲम्बुलन्स 🚑</div>
+                  </div>
+                </div>
+
+                <div class="prize-tier-item bronze-tier">
+                  <div class="prize-medal">🥉</div>
+                  <div class="prize-info">
+                    <div class="prize-rank">तृतीय बक्षिस</div>
+                    <div class="prize-amount">₹५,००,०००</div>
+                    <div class="prize-bonus">+ गावासाठी पिठाची गिरणी 🌾</div>
+                  </div>
+                </div>
+
+                <!-- Contact Helplines -->
+                <div class="prizes-contact-box">
+                  <span>नोंदणीसाठी थेट संपर्क:</span>
+                  <a href="tel:+919987213141" class="prizes-phone-link">
+                    <i class="fas fa-phone-alt"></i> 9987213141
+                  </a>
+                  <div class="prizes-door-tag">
+                    <i class="fas fa-bullhorn"></i> महत्वाचं – आम्ही येतोय तुमच्या दारी!
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Buttons Group -->
+              <div class="form-submit-group">
+                <button type="submit" class="btn-submit-registration">
+                  <i class="fas fa-paper-plane"></i> ऑनलाइन फॉर्म सबमिट करा
+                </button>
+                <button type="button" id="btn-submit-wa" class="btn-submit-whatsapp-direct">
+                  <i class="fab fa-whatsapp"></i> व्हॉट्सअॅपवर थेट पाठवा
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Namdar Registration Form Trigger Button & Tooltip -->
+  <div class="floating-form-wrapper">
+    <div id="floating-form-tooltip" class="floating-form-tooltip">
+      <div class="tooltip-header">
+        <span class="tooltip-badge">🏆 भव्य बक्षिस!</span>
+        <button id="tooltip-close-btn" class="tooltip-close-btn">&times;</button>
+      </div>
+      <div class="tooltip-text">नामदार महाराष्ट्राचा अधिकृत नोंदणी फॉर्म भरा!</div>
+      <div class="tooltip-sub">जिंका ₹११ लाख + ट्रॅक्टर 🚜</div>
+    </div>
+    <button id="floating-registration-btn" class="floating-registration-btn" aria-label="नामदार महाराष्ट्राचा नोंदणी फॉर्म">
+      <i class="fas fa-file-signature"></i>
+      <span class="btn-pulse-ring"></span>
+    </button>
+  </div>
+
   <!-- Floating WhatsApp Button -->
   <a href="https://wa.me/919987213141?text=Hello%20Gramin%20Bharat%20TV%20team,%20I%20visited%20your%20website%20and%20would%20like%20to%20connect." target="_blank" class="floating-whatsapp-btn" aria-label="Chat on WhatsApp">
     <i class="fab fa-whatsapp"></i>

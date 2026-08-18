@@ -288,6 +288,40 @@ document.addEventListener("DOMContentLoaded", () => {
       `).join("");
     }
 
+    // 8.5 Sarpanch Registrations Table
+    const regTable = document.getElementById("table-registrations-body");
+    if (regTable) {
+      const registrations = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+      if (registrations.length === 0) {
+        regTable.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--admin-text-dim); padding: 30px;">अद्याप कोणतीही नोंदणी प्राप्त झालेली नाही. (No registrations received yet.)</td></tr>`;
+      } else {
+        regTable.innerHTML = registrations.map((reg) => `
+          <tr>
+            <td style="font-size: 0.75rem; color: var(--admin-text-muted);">${reg.submittedAt || '-'}</td>
+            <td style="font-weight: 700; color: #fff;">${reg.fullName}</td>
+            <td>
+              <a href="tel:${reg.mobile}" style="color: #38bdf8; text-decoration: none; display: block; font-weight: 600;">📞 ${reg.mobile}</a>
+              <a href="https://wa.me/${(reg.whatsapp || '').replace(/[^0-9]/g, '')}" target="_blank" style="color: #22c55e; font-size: 0.76rem; text-decoration: none;">💬 WA: ${reg.whatsapp}</a>
+            </td>
+            <td>
+              <strong>${reg.village}</strong>, ${reg.taluka}, ${reg.district}
+            </td>
+            <td>
+              <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; background: ${reg.isCurrentSarpanch === 'होय' ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)'}; color: ${reg.isCurrentSarpanch === 'होय' ? '#22c55e' : '#f59e0b'};">
+                ${reg.isCurrentSarpanch === 'होय' ? 'सध्या कार्यरत' : 'माजी सरपंच'}
+              </span>
+            </td>
+            <td>
+              <div class="table-action-btns">
+                <button class="btn-tbl-action" onclick="viewRegistrationDetail(${reg.id})" title="View Details"><i class="fas fa-eye"></i></button>
+                <button class="btn-tbl-action btn-tbl-delete" onclick="deleteRegistration(${reg.id})" title="Delete Entry"><i class="fas fa-trash-alt"></i></button>
+              </div>
+            </td>
+          </tr>
+        `).join("");
+      }
+    }
+
     // 9. Contact Info Form
     if (data.brand) {
       const phoneDisp = document.getElementById("contact-phone-display");
@@ -755,17 +789,135 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Reset to defaults
-  const btnReset = document.getElementById("btn-backup-reset");
-  if (btnReset) {
-    btnReset.addEventListener("click", () => {
-      if (confirm("WARNING: This will reset all content to default factory settings. Are you sure?")) {
-        window.resetCmsData();
-        showToast("Database reset to factory default.");
+  // =========================================================================
+  // 7. SARPANCH REGISTRATIONS CONTROLLER
+  // =========================================================================
+  window.viewRegistrationDetail = function(regId) {
+    const registrations = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+    const reg = registrations.find(r => r.id == regId);
+    if (!reg) return;
+
+    crudModalTitle.textContent = `Sarpanch Registration: ${reg.fullName}`;
+    crudFormFields.innerHTML = `
+      <div class="admin-form-group form-group-full" style="background: var(--admin-bg-surface); padding: 14px; border-radius: 8px;">
+        <strong style="color: #ff8c00; font-size: 1rem; display: block; margin-bottom: 4px;">👤 ${reg.fullName}</strong>
+        <span style="font-size: 0.8rem; color: var(--admin-text-muted);">Submitted on: ${reg.submittedAt}</span>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label">Mobile Number</label>
+        <div style="font-size: 0.95rem; color: #fff; font-weight: 700;">📞 ${reg.mobile}</div>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label">WhatsApp Number</label>
+        <div style="font-size: 0.95rem; color: #22c55e; font-weight: 700;">💬 ${reg.whatsapp}</div>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label">Village & Taluka</label>
+        <div style="font-size: 0.9rem; color: #fff;">${reg.village}, ${reg.taluka}</div>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label">District & Pincode</label>
+        <div style="font-size: 0.9rem; color: #fff;">${reg.district} - ${reg.pincode || '-'}</div>
+      </div>
+      <div class="admin-form-group form-group-full">
+        <label class="admin-label">Full Address</label>
+        <div style="font-size: 0.85rem; color: #cbd5e1;">${reg.address || '-'}</div>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label">Currently Active Sarpanch?</label>
+        <div style="font-size: 0.9rem; color: #ff8c00; font-weight: 700;">${reg.isCurrentSarpanch}</div>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label">Tenure Period</label>
+        <div style="font-size: 0.9rem; color: #fff;">${reg.tenureFrom || '-'} to ${reg.tenureTo || '-'} (${reg.totalYears || '-'})</div>
+      </div>
+      <div class="admin-form-group form-group-full">
+        <label class="admin-label">5 Key Works Done for Village</label>
+        <ol style="margin-left: 20px; font-size: 0.86rem; color: #e2e8f0; line-height: 1.6;">
+          ${(reg.works || []).map(w => `<li>${w}</li>`).join("")}
+        </ol>
+      </div>
+      <div class="admin-form-group form-group-full">
+        <label class="admin-label">Special Initiatives</label>
+        <div style="font-size: 0.85rem; color: #cbd5e1; background: #060b18; padding: 10px; border-radius: 6px;">${reg.specialInitiatives || 'None specified'}</div>
+      </div>
+      <div class="admin-form-group form-group-full">
+        <label class="admin-label">Awards & Honors</label>
+        <div style="font-size: 0.85rem; color: #f59e0b;">🏆 ${reg.awards || 'None'}</div>
+      </div>
+      <div class="admin-form-group form-group-full" style="background: rgba(253, 102, 0, 0.08); border: 1px solid rgba(253, 102, 0, 0.25); padding: 12px; border-radius: 8px;">
+        <label class="admin-label" style="color: #ff8c00; font-weight: 800;">📎 Attached Documents & Photos</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.82rem; margin-top: 6px;">
+          <div><strong>1. Sarpanch Photo:</strong> <span style="color: #38bdf8;">${reg.documentsAttached?.sarpanchPhoto || 'Attached'}</span></div>
+          <div><strong>2. ID Proof:</strong> <span style="color: #38bdf8;">${reg.documentsAttached?.idProof || 'Attached'}</span></div>
+          <div><strong>3. Works Photos:</strong> <span style="color: #38bdf8;">${reg.documentsAttached?.worksPhotos || 'Attached'}</span></div>
+          <div><strong>4. Certificates:</strong> <span style="color: #38bdf8;">${reg.documentsAttached?.certificates || 'None'}</span></div>
+        </div>
+      </div>
+    `;
+
+    crudModalSaveBtn.style.display = "none";
+    crudModal.classList.add("open");
+  };
+
+  window.deleteRegistration = function(regId) {
+    if (!confirm("Are you sure you want to delete this registration?")) return;
+    let registrations = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+    registrations = registrations.filter(r => r.id != regId);
+    localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(registrations));
+    showToast("Registration entry deleted.");
+    loadAdminData();
+  };
+
+  // Export CSV
+  const btnExportCsv = document.getElementById("btn-export-registrations-csv");
+  if (btnExportCsv) {
+    btnExportCsv.addEventListener("click", () => {
+      const registrations = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+      if (registrations.length === 0) {
+        alert("No registrations available to export.");
+        return;
+      }
+
+      let csv = "ID,Date,Full Name,Mobile,WhatsApp,Email,Village,Taluka,District,Address,Currently Sarpanch,Tenure,Key Works,Special Initiatives,Awards\n";
+      registrations.forEach(r => {
+        const worksClean = (r.works || []).join(" | ").replace(/"/g, '""');
+        const initiativesClean = (r.specialInitiatives || '').replace(/"/g, '""');
+        const awardsClean = (r.awards || '').replace(/"/g, '""');
+        csv += `"${r.id}","${r.submittedAt}","${r.fullName}","${r.mobile}","${r.whatsapp}","${r.email || ''}","${r.village}","${r.taluka}","${r.district}","${r.address || ''}","${r.isCurrentSarpanch}","${r.tenureFrom || ''} - ${r.tenureTo || ''}","${worksClean}","${initiativesClean}","${awardsClean}"\n`;
+      });
+
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Sarpanch_Registrations_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast("Registrations CSV downloaded successfully!");
+    });
+  }
+
+  // Clear All Registrations
+  const btnClearReg = document.getElementById("btn-clear-registrations");
+  if (btnClearReg) {
+    btnClearReg.addEventListener("click", () => {
+      if (confirm("WARNING: Are you sure you want to clear all registration submissions?")) {
+        localStorage.removeItem("GBTV_SARPANCH_REGISTRATIONS");
+        showToast("All registrations cleared.");
         loadAdminData();
       }
     });
   }
+
+  // Reset modal save button display when opening CRUD modal
+  const origOpenCrudModal = window.openCrudModal;
+  window.openCrudModal = function(sectionKey, itemId = null) {
+    if (crudModalSaveBtn) crudModalSaveBtn.style.display = "inline-flex";
+    origOpenCrudModal(sectionKey, itemId);
+  };
 
   // Initial Load
   loadAdminData();

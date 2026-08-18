@@ -295,8 +295,225 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(openWelcomePopup, 650);
   }
 
+  // =========================================================================
+  // NAMDAR MAHARASHTRACHA REGISTRATION FORM & 5-SEC FLOATING TOOLTIP
+  // =========================================================================
+  const floatingRegBtn = document.getElementById("floating-registration-btn");
+  const floatingTooltip = document.getElementById("floating-form-tooltip");
+  const tooltipCloseBtn = document.getElementById("tooltip-close-btn");
+  const namdarModal = document.getElementById("namdar-form-modal");
+  const namdarModalCloseBtn = document.getElementById("namdar-form-close-btn");
+  const sarpanchForm = document.getElementById("sarpanch-registration-form");
+  const btnSubmitWa = document.getElementById("btn-submit-wa");
+
+  function openNamdarModal() {
+    if (namdarModal) {
+      namdarModal.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+  }
+
+  function closeNamdarModal() {
+    if (namdarModal) {
+      namdarModal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  }
+
+  if (floatingRegBtn) {
+    floatingRegBtn.addEventListener("click", openNamdarModal);
+  }
+
+  if (floatingTooltip) {
+    floatingTooltip.addEventListener("click", (e) => {
+      if (e.target !== tooltipCloseBtn) {
+        openNamdarModal();
+      }
+    });
+  }
+
+  if (tooltipCloseBtn) {
+    tooltipCloseBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      floatingTooltip.classList.remove("show");
+    });
+  }
+
+  if (namdarModalCloseBtn) {
+    namdarModalCloseBtn.addEventListener("click", closeNamdarModal);
+  }
+
+  if (namdarModal) {
+    namdarModal.addEventListener("click", (e) => {
+      if (e.target === namdarModal) closeNamdarModal();
+    });
+  }
+
+  // 5-Second Interval Message Popup Tooltip
+  const tooltipMessages = [
+    { badge: "🏆 भव्य बक्षिस!", title: "नामदार महाराष्ट्राचा अधिकृत नोंदणी फॉर्म भरा!", sub: "जिंका ₹११ लाख + ट्रॅक्टर 🚜" },
+    { badge: "🌾 सरपंच सन्मान!", title: "तुमच्या गावाचा विकास महाराष्ट्राला दाखवा!", sub: "नोंदणी सुरू आहे 📝" },
+    { badge: "⭐ अधिकृत नोंदणी", title: "आम्ही येतोय तुमच्या दारी! आजच नोंदणी करा", sub: "थेट संपर्क: 9987213141 📞" }
+  ];
+  let tooltipIdx = 0;
+
+  function triggerFloatingTooltip() {
+    if (!floatingTooltip || (namdarModal && namdarModal.classList.contains("active"))) return;
+    
+    const msg = tooltipMessages[tooltipIdx % tooltipMessages.length];
+    tooltipIdx++;
+    
+    const badgeEl = floatingTooltip.querySelector(".tooltip-badge");
+    const titleEl = floatingTooltip.querySelector(".tooltip-text");
+    const subEl = floatingTooltip.querySelector(".tooltip-sub");
+    
+    if (badgeEl) badgeEl.textContent = msg.badge;
+    if (titleEl) titleEl.textContent = msg.title;
+    if (subEl) subEl.textContent = msg.sub;
+
+    floatingTooltip.classList.add("show");
+    
+    setTimeout(() => {
+      if (floatingTooltip) floatingTooltip.classList.remove("show");
+    }, 3800);
+  }
+
+  // Pop on 5-second recurring interval
+  setTimeout(triggerFloatingTooltip, 1500);
+  setInterval(triggerFloatingTooltip, 5000);
+
+  // File Upload Status Updaters
+  const fileUploadInputs = [
+    { inputId: "upload-sarpanch-photo", statusId: "status-sarpanch-photo" },
+    { inputId: "upload-id-proof", statusId: "status-id-proof" },
+    { inputId: "upload-works-photos", statusId: "status-works-photos" },
+    { inputId: "upload-certificates", statusId: "status-certificates" }
+  ];
+
+  fileUploadInputs.forEach(item => {
+    const el = document.getElementById(item.inputId);
+    const statusEl = document.getElementById(item.statusId);
+    if (el && statusEl) {
+      el.addEventListener("change", (e) => {
+        const files = e.target.files;
+        const box = el.closest(".doc-upload-box");
+        if (files && files.length > 0) {
+          if (files.length === 1) {
+            statusEl.textContent = `✓ ${files[0].name} (${Math.round(files[0].size / 1024)} KB)`;
+          } else {
+            statusEl.textContent = `✓ ${files.length} फाइल्स निवडल्या`;
+          }
+          if (box) box.classList.add("has-file");
+        } else {
+          statusEl.textContent = "कोणतीही फाइल निवडलेली नाही";
+          if (box) box.classList.remove("has-file");
+        }
+      });
+    }
+  });
+
+  // Handle Online Form Submission
+  if (sarpanchForm) {
+    sarpanchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      
+      const photoEl = document.getElementById("upload-sarpanch-photo");
+      const idProofEl = document.getElementById("upload-id-proof");
+      const worksPhotosEl = document.getElementById("upload-works-photos");
+      const certEl = document.getElementById("upload-certificates");
+
+      const documentsAttached = {
+        sarpanchPhoto: photoEl?.files?.[0]?.name || "Not attached",
+        idProof: idProofEl?.files?.[0]?.name || "Not attached",
+        worksPhotos: Array.from(worksPhotosEl?.files || []).map(f => f.name).join(", ") || "Not attached",
+        certificates: certEl?.files?.[0]?.name || "Not attached"
+      };
+
+      const registrationData = {
+        id: Date.now(),
+        submittedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+        fullName: document.getElementById("reg-fullname")?.value.trim() || "",
+        mobile: document.getElementById("reg-mobile")?.value.trim() || "",
+        whatsapp: document.getElementById("reg-whatsapp")?.value.trim() || "",
+        email: document.getElementById("reg-email")?.value.trim() || "",
+        education: document.getElementById("reg-education")?.value.trim() || "",
+        village: document.getElementById("reg-village")?.value.trim() || "",
+        taluka: document.getElementById("reg-taluka")?.value.trim() || "",
+        district: document.getElementById("reg-district")?.value.trim() || "",
+        pincode: document.getElementById("reg-pincode")?.value.trim() || "",
+        address: document.getElementById("reg-address")?.value.trim() || "",
+        isCurrentSarpanch: document.querySelector("input[name='reg-is-current']:checked")?.value || "होय",
+        tenureFrom: document.getElementById("reg-tenure-from")?.value.trim() || "",
+        tenureTo: document.getElementById("reg-tenure-to")?.value.trim() || "",
+        totalYears: document.getElementById("reg-total-years")?.value.trim() || "",
+        works: [
+          document.getElementById("reg-work-1")?.value.trim(),
+          document.getElementById("reg-work-2")?.value.trim(),
+          document.getElementById("reg-work-3")?.value.trim(),
+          document.getElementById("reg-work-4")?.value.trim(),
+          document.getElementById("reg-work-5")?.value.trim()
+        ].filter(Boolean),
+        specialInitiatives: document.getElementById("reg-special-initiatives")?.value.trim() || "",
+        awards: document.getElementById("reg-awards")?.value.trim() || "",
+        documentsAttached: documentsAttached,
+        status: "New"
+      };
+
+      try {
+        const stored = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+        stored.unshift(registrationData);
+        localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(stored));
+      } catch (err) {
+        console.error("Storage error:", err);
+      }
+
+      showToast("✅ तुमची नोंदणी व कागदपत्रे यशस्वीरित्या सबमिट झाली आहेत! लवकरच आमची टीम संपर्क साधेल.");
+      sarpanchForm.reset();
+      fileUploadInputs.forEach(item => {
+        const statusEl = document.getElementById(item.statusId);
+        const box = document.getElementById(item.inputId)?.closest(".doc-upload-box");
+        if (statusEl) statusEl.textContent = "कोणतीही फाइल निवडलेली नाही";
+        if (box) box.classList.remove("has-file");
+      });
+      closeNamdarModal();
+    });
+  }
+
+  // Handle WhatsApp Direct Send
+  if (btnSubmitWa) {
+    btnSubmitWa.addEventListener("click", () => {
+      const name = document.getElementById("reg-fullname")?.value.trim() || "सरपंच";
+      const mobile = document.getElementById("reg-mobile")?.value.trim() || "-";
+      const wa = document.getElementById("reg-whatsapp")?.value.trim() || "-";
+      const village = document.getElementById("reg-village")?.value.trim() || "-";
+      const taluka = document.getElementById("reg-taluka")?.value.trim() || "-";
+      const dist = document.getElementById("reg-district")?.value.trim() || "-";
+      const work1 = document.getElementById("reg-work-1")?.value.trim() || "-";
+      const work2 = document.getElementById("reg-work-2")?.value.trim() || "-";
+      const special = document.getElementById("reg-special-initiatives")?.value.trim() || "-";
+      const awards = document.getElementById("reg-awards")?.value.trim() || "-";
+
+      const waMsg = `*🚩 नामदार महाराष्ट्राचा - अधिकृत नोंदणी फॉर्म 🚩*\n` +
+        `----------------------------------------\n` +
+        `👤 *सरपंच नाव:* ${name}\n` +
+        `📱 *मोबाईल:* ${mobile}\n` +
+        `💬 *व्हॉट्सअॅप:* ${wa}\n` +
+        `🏡 *गाव:* ${village}\n` +
+        `📍 *तालुका:* ${taluka} | *जिल्हा:* ${dist}\n` +
+        `🛠️ *प्रमुख कामे:* 1) ${work1}, 2) ${work2}\n` +
+        `⭐ *विशेष उपक्रम:* ${special}\n` +
+        `🏆 *पुरस्कार:* ${awards}\n` +
+        `----------------------------------------\n` +
+        `_मी नामदार महाराष्ट्राचा स्पर्धेत सहभागी होण्यासाठी नोंदणी करत आहे. धन्यवाद!_`;
+
+      const encoded = encodeURIComponent(waMsg);
+      window.open(`https://wa.me/919987213141?text=${encoded}`, "_blank");
+    });
+  }
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
+      closeNamdarModal();
       closeWelcomePopup();
       closeVideoModal();
       closeSearchModal();

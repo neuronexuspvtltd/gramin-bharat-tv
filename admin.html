@@ -101,6 +101,10 @@
         </button>
 
         <span class="admin-nav-label">Journalism & Community</span>
+        <button class="admin-nav-item" data-tab="tab-registrations">
+          <i class="fas fa-file-signature"></i>
+          <span>Sarpanch Registrations</span>
+        </button>
         <button class="admin-nav-item" data-tab="tab-news">
           <i class="fas fa-newspaper"></i>
           <span>News & Articles</span>
@@ -461,6 +465,46 @@
                   </tr>
                 </thead>
                 <tbody id="table-showcase-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB: SARPANCH REGISTRATIONS
+             =================================================================== -->
+        <section id="tab-registrations" class="admin-tab-pane">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-file-signature"></i>
+                <span>Namdar Maharashtracha – Official Registrations</span>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <button id="btn-export-registrations-csv" class="btn-export-json" style="background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.4); color: #22c55e;">
+                  <i class="fas fa-file-csv"></i> Download CSV / Excel
+                </button>
+                <button id="btn-clear-registrations" class="btn-tbl-action btn-tbl-delete" style="width: auto; padding: 6px 14px; font-weight: 700; border-radius: 8px;">
+                  <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+              </div>
+            </div>
+
+            <div class="admin-table-responsive">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Date & Time</th>
+                    <th>Sarpanch Full Name</th>
+                    <th>Mobile / WhatsApp</th>
+                    <th>Village / Taluka / District</th>
+                    <th>Status / Tenure</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="table-registrations-body">
                   <!-- Populated by JS -->
                 </tbody>
               </table>
