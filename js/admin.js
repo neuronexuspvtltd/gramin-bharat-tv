@@ -110,6 +110,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 4000);
   }
 
+  window.previewUploadedImage = function(imgSrc, title = "Uploaded Document") {
+    if (!imgSrc) {
+      alert("No image preview available.");
+      return;
+    }
+    const win = window.open("", "_blank", "width=850,height=750");
+    if (win) {
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${title} - Image Viewer</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { background: #0f172a; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; text-align: center; }
+            h2 { font-size: 1.1rem; color: #fdba74; margin-bottom: 16px; font-weight: 700; }
+            .img-card { background: #1e293b; padding: 12px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); max-width: 95vw; border: 1px solid #334155; }
+            img { max-width: 100%; max-height: 75vh; border-radius: 8px; object-fit: contain; display: block; margin: 0 auto; }
+            .btn-row { margin-top: 18px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+            .btn-act { padding: 10px 22px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; text-decoration: none; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+            .btn-download { background: #ea580c; color: #ffffff; }
+            .btn-close { background: #334155; color: #e2e8f0; }
+            .btn-download:hover { background: #c2410c; }
+            .btn-close:hover { background: #475569; }
+          </style>
+        </head>
+        <body>
+          <h2>${title}</h2>
+          <div class="img-card">
+            <img src="${imgSrc}" alt="${title}">
+          </div>
+          <div class="btn-row">
+            <a href="${imgSrc}" download="document_photo.jpg" class="btn-act btn-download">📥 Download Image</a>
+            <button onclick="window.close()" class="btn-act btn-close">Close Viewer</button>
+          </div>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    } else {
+      alert("Popup blocked. Please allow popups for this site to view the image.");
+    }
+  };
+
   function renderRegistrationsTable(registrations, isCloud = false) {
     const regTable = document.getElementById("table-registrations-body");
     if (!regTable) return;
@@ -124,7 +169,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <td style="font-size: 0.75rem; color: var(--admin-text-muted);">${reg.submittedAt || '-'}</td>
         <td style="font-weight: 700; color: var(--admin-text-main);">
           ${reg.fullName}
-          ${reg.documentsAttached?.sarpanchPhotoUrl ? `<a href="${reg.documentsAttached.sarpanchPhotoUrl}" target="_blank" title="View Uploaded Photo" style="margin-left: 6px; color: #ea580c; font-size: 0.8rem;"><i class="fas fa-image"></i></a>` : ''}
+          ${reg.documentsAttached?.sarpanchPhotoUrl ? `
+            <button type="button" class="btn-tbl-action" onclick="previewUploadedImage('${reg.documentsAttached.sarpanchPhotoUrl}', 'Sarpanch Photo: ${(reg.fullName || '').replace(/'/g, "\\'")}')" title="Click to View Uploaded Photo" style="display: inline-flex; width: 24px; height: 24px; border-radius: 4px; margin-left: 6px; color: #ea580c; border-color: #fdba74; background: #fff7ed; vertical-align: middle; cursor: pointer;">
+              <i class="fas fa-image" style="font-size: 0.75rem;"></i>
+            </button>` : ''}
         </td>
         <td>
           <a href="tel:${reg.mobile}" style="color: var(--admin-info); text-decoration: none; display: block; font-weight: 600;">📞 ${reg.mobile}</a>
@@ -857,13 +905,54 @@ document.addEventListener("DOMContentLoaded", () => {
         <label class="admin-label">Awards & Honors</label>
         <div style="font-size: 0.85rem; color: var(--admin-warning);">🏆 ${reg.awards || 'None'}</div>
       </div>
-      <div class="admin-form-group form-group-full" style="background: #fff7ed; border: 1px solid #fed7aa; padding: 12px; border-radius: 8px;">
-        <label class="admin-label" style="color: var(--admin-primary); font-weight: 800;">📎 Attached Documents & Photos</label>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.82rem; margin-top: 6px;">
-          <div><strong>1. Sarpanch Photo:</strong> <span style="color: var(--admin-info);">${reg.documentsAttached?.sarpanchPhoto || 'Attached'}</span></div>
-          <div><strong>2. ID Proof:</strong> <span style="color: var(--admin-info);">${reg.documentsAttached?.idProof || 'Attached'}</span></div>
-          <div><strong>3. Works Photos:</strong> <span style="color: var(--admin-info);">${reg.documentsAttached?.worksPhotos || 'Attached'}</span></div>
-          <div><strong>4. Certificates:</strong> <span style="color: var(--admin-info);">${reg.documentsAttached?.certificates || 'None'}</span></div>
+      <div class="admin-form-group form-group-full" style="background: #fff7ed; border: 1.5px solid #fed7aa; padding: 14px; border-radius: 8px;">
+        <label class="admin-label" style="color: #9a3412; font-weight: 800; font-size: 0.95rem; margin-bottom: 10px;">📎 Attached Documents & Photos Preview</label>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 6px;">
+          <!-- Sarpanch Photo -->
+          <div style="background: #ffffff; padding: 10px; border-radius: 6px; border: 1px solid #fed7aa; text-align: center;">
+            <strong style="font-size: 0.8rem; color: #9a3412; display: block; margin-bottom: 6px;">1. Sarpanch Photo</strong>
+            ${reg.documentsAttached?.sarpanchPhotoUrl ? `
+              <img src="${reg.documentsAttached.sarpanchPhotoUrl}" alt="Sarpanch Photo" style="max-height: 100px; max-width: 100%; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid #e2e8f0;" onclick="previewUploadedImage('${reg.documentsAttached.sarpanchPhotoUrl}', 'Sarpanch Photo: ${reg.fullName}')">
+              <button type="button" class="btn-export-json" onclick="previewUploadedImage('${reg.documentsAttached.sarpanchPhotoUrl}', 'Sarpanch Photo: ${reg.fullName}')" style="margin-top: 6px; width: 100%; justify-content: center; font-size: 0.75rem; padding: 4px 8px;">
+                <i class="fas fa-search-plus"></i> View Full Image
+              </button>
+            ` : `<span style="font-size: 0.8rem; color: var(--admin-text-muted);">${reg.documentsAttached?.sarpanchPhoto || 'Not attached'}</span>`}
+          </div>
+
+          <!-- ID Proof -->
+          <div style="background: #ffffff; padding: 10px; border-radius: 6px; border: 1px solid #fed7aa; text-align: center;">
+            <strong style="font-size: 0.8rem; color: #9a3412; display: block; margin-bottom: 6px;">2. ID Proof (Aadhaar)</strong>
+            ${reg.documentsAttached?.idProofUrl ? `
+              <img src="${reg.documentsAttached.idProofUrl}" alt="ID Proof" style="max-height: 100px; max-width: 100%; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid #e2e8f0;" onclick="previewUploadedImage('${reg.documentsAttached.idProofUrl}', 'ID Proof: ${reg.fullName}')">
+              <button type="button" class="btn-export-json" onclick="previewUploadedImage('${reg.documentsAttached.idProofUrl}', 'ID Proof: ${reg.fullName}')" style="margin-top: 6px; width: 100%; justify-content: center; font-size: 0.75rem; padding: 4px 8px;">
+                <i class="fas fa-search-plus"></i> View Full Image
+              </button>
+            ` : `<span style="font-size: 0.8rem; color: var(--admin-text-muted);">${reg.documentsAttached?.idProof || 'Not attached'}</span>`}
+          </div>
+
+          <!-- Works Photos -->
+          <div style="background: #ffffff; padding: 10px; border-radius: 6px; border: 1px solid #fed7aa; text-align: center;">
+            <strong style="font-size: 0.8rem; color: #9a3412; display: block; margin-bottom: 6px;">3. Development Works</strong>
+            ${(reg.documentsAttached?.worksPhotosUrls && reg.documentsAttached.worksPhotosUrls.length > 0) ? `
+              <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
+                ${reg.documentsAttached.worksPhotosUrls.map((url, idx) => `
+                  <img src="${url}" alt="Work ${idx+1}" style="width: 48px; height: 48px; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid #e2e8f0;" onclick="previewUploadedImage('${url}', 'Development Work ${idx+1}')">
+                `).join("")}
+              </div>
+            ` : `<span style="font-size: 0.8rem; color: var(--admin-text-muted);">${reg.documentsAttached?.worksPhotos || 'Not attached'}</span>`}
+          </div>
+
+          <!-- Certificates -->
+          <div style="background: #ffffff; padding: 10px; border-radius: 6px; border: 1px solid #fed7aa; text-align: center;">
+            <strong style="font-size: 0.8rem; color: #9a3412; display: block; margin-bottom: 6px;">4. Certificates & Awards</strong>
+            ${reg.documentsAttached?.certificatesUrl ? `
+              <img src="${reg.documentsAttached.certificatesUrl}" alt="Certificate" style="max-height: 100px; max-width: 100%; border-radius: 4px; object-fit: cover; cursor: pointer; border: 1px solid #e2e8f0;" onclick="previewUploadedImage('${reg.documentsAttached.certificatesUrl}', 'Certificate: ${reg.fullName}')">
+              <button type="button" class="btn-export-json" onclick="previewUploadedImage('${reg.documentsAttached.certificatesUrl}', 'Certificate: ${reg.fullName}')" style="margin-top: 6px; width: 100%; justify-content: center; font-size: 0.75rem; padding: 4px 8px;">
+                <i class="fas fa-search-plus"></i> View Full Image
+              </button>
+            ` : `<span style="font-size: 0.8rem; color: var(--admin-text-muted);">${reg.documentsAttached?.certificates || 'None'}</span>`}
+          </div>
         </div>
       </div>
       <div class="admin-form-group form-group-full" style="margin-top: 8px;">
@@ -987,9 +1076,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <h1>नामदार महाराष्ट्राचा - सरपंच सन्मान</h1>
             <h2>अधिकृत नोंदणी अर्ज (Official Registration Application)</h2>
           </div>
-          <div class="header-right">
-            <span class="reg-badge">${data.regId || ('GBTV-' + data.id.toString().slice(-6))}</span>
-            <div class="reg-date">अर्ज दिनांक: ${data.submittedAt}</div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            ${data.documentsAttached?.sarpanchPhotoUrl ? `
+              <img src="${data.documentsAttached.sarpanchPhotoUrl}" alt="Photo" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1.5px solid #ea580c;">
+            ` : ''}
+            <div class="header-right">
+              <span class="reg-badge">${data.regId || ('GBTV-' + data.id.toString().slice(-6))}</span>
+              <div class="reg-date">अर्ज दिनांक: ${data.submittedAt}</div>
+            </div>
           </div>
         </div>
 

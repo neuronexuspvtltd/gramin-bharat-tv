@@ -569,9 +569,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <h1>नामदार महाराष्ट्राचा - सरपंच सन्मान</h1>
             <h2>अधिकृत नोंदणी अर्ज (Official Registration Application)</h2>
           </div>
-          <div class="header-right">
-            <span class="reg-badge">${data.regId || ('GBTV-' + Date.now().toString().slice(-6))}</span>
-            <div class="reg-date">अर्ज दिनांक: ${data.submittedAt}</div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            ${data.documentsAttached?.sarpanchPhotoUrl ? `
+              <img src="${data.documentsAttached.sarpanchPhotoUrl}" alt="Photo" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1.5px solid #ea580c;">
+            ` : ''}
+            <div class="header-right">
+              <span class="reg-badge">${data.regId || ('GBTV-' + Date.now().toString().slice(-6))}</span>
+              <div class="reg-date">अर्ज दिनांक: ${data.submittedAt}</div>
+            </div>
           </div>
         </div>
 
