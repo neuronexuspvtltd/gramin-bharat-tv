@@ -4,7 +4,7 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  const data = window.GBTV_DATA;
+  const data = (window.getCmsData ? window.getCmsData() : window.GBTV_DATA) || window.GBTV_DATA;
   if (!data) {
     console.error("GBTV_DATA not loaded.");
     return;
@@ -247,12 +247,29 @@ document.addEventListener("DOMContentLoaded", () => {
   if (mobileDrawerCloseBtn) mobileDrawerCloseBtn.addEventListener("click", closeMobileDrawer);
   if (mobileDrawerBackdrop) mobileDrawerBackdrop.addEventListener("click", closeMobileDrawer);
 
-  // Welcome Poster Announcement Popup
+  // Welcome Poster Announcement Popup (Dynamic from CMS)
   const welcomePopupBackdrop = document.getElementById("welcome-popup-backdrop");
   const welcomePopupCloseBtn = document.getElementById("welcome-popup-close-btn");
+  const popupConfig = data.announcementPopup || { enabled: true, image: "assets/popup_poster.jpg" };
+
+  if (welcomePopupBackdrop && popupConfig) {
+    const posterImg = welcomePopupBackdrop.querySelector(".welcome-poster-img");
+    if (posterImg && popupConfig.image) {
+      posterImg.src = popupConfig.image;
+    }
+    const callBtn = welcomePopupBackdrop.querySelector(".btn-popup-call");
+    if (callBtn && popupConfig.callNumber) {
+      callBtn.href = `tel:${popupConfig.callNumber}`;
+      callBtn.innerHTML = `<i class="fas fa-phone-alt"></i> Call: ${popupConfig.phoneDisplay || popupConfig.callNumber}`;
+    }
+    const waBtn = welcomePopupBackdrop.querySelector(".btn-popup-wa");
+    if (waBtn && popupConfig.waNumber) {
+      waBtn.href = `https://wa.me/${popupConfig.waNumber.replace(/[^0-9]/g, '')}?text=Hello%20Gramin%20Bharat%20TV,%20I%20saw%20your%20poster%20and%20want%20to%20connect.`;
+    }
+  }
 
   function openWelcomePopup() {
-    if (welcomePopupBackdrop) {
+    if (welcomePopupBackdrop && popupConfig && popupConfig.enabled !== false) {
       welcomePopupBackdrop.classList.add("active");
     }
   }
@@ -273,8 +290,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Show welcome popup 650ms after user lands on website
-  setTimeout(openWelcomePopup, 650);
+  // Show welcome popup 650ms after user lands on website (if enabled)
+  if (popupConfig && popupConfig.enabled !== false) {
+    setTimeout(openWelcomePopup, 650);
+  }
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {

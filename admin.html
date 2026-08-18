@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin CMS Panel | Gramin Bharat TV (ग्रामीण भारत टीव्ही)</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Noto+Serif+Devanagari:wght@700;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Admin Stylesheet -->
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+  <!-- =========================================================================
+       1. AUTHENTICATION GATE (LOGIN SCREEN)
+       ========================================================================= -->
+  <div id="admin-login-backdrop" class="admin-login-backdrop">
+    <div class="admin-login-card">
+      <div class="admin-login-logo-wrap">
+        <img src="assets/logo.png" alt="Gramin Bharat TV" class="admin-login-logo">
+      </div>
+      <h2 class="admin-login-title">Executive CMS Portal</h2>
+      <p class="admin-login-sub">Manage broadcasts, news, episodes, and platform content</p>
+
+      <form id="admin-login-form">
+        <div class="login-form-group">
+          <label class="login-form-label" for="login-email">Admin Email</label>
+          <div class="login-input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="login-email" class="login-input" placeholder="admin@graminbharat-tv.com" value="admin@graminbharat-tv.com" required>
+          </div>
+        </div>
+
+        <div class="login-form-group">
+          <label class="login-form-label" for="login-password">Security Passcode</label>
+          <div class="login-input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="login-password" class="login-input" placeholder="Enter password" value="gbtv2026" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-admin-login">
+          <i class="fas fa-shield-alt"></i> Access Admin Dashboard
+        </button>
+
+        <p class="login-hint-text">
+          <i class="fas fa-info-circle"></i> Default Passcode: <strong>gbtv2026</strong>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. MAIN ADMIN DASHBOARD SHELL
+       ========================================================================= -->
+  <div class="admin-layout-wrapper">
+    
+    <!-- Sidebar Navigation -->
+    <aside id="admin-sidebar" class="admin-sidebar">
+      <div class="admin-sidebar-brand">
+        <div class="sidebar-logo-badge">
+          <img src="assets/logo.png" alt="Gramin Bharat TV" class="sidebar-logo-img">
+        </div>
+        <div>
+          <div class="sidebar-brand-title">Gramin Bharat TV</div>
+          <div class="sidebar-brand-sub">CMS Control Hub</div>
+        </div>
+      </div>
+
+      <nav class="admin-nav-menu">
+        <span class="admin-nav-label">Core Overview</span>
+        <button class="admin-nav-item active" data-tab="tab-dashboard">
+          <i class="fas fa-chart-pie"></i>
+          <span>Dashboard Overview</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-popup">
+          <i class="fas fa-bullhorn"></i>
+          <span>Announcement Popup</span>
+        </button>
+
+        <span class="admin-nav-label">Broadcasting & Media</span>
+        <button class="admin-nav-item" data-tab="tab-hero">
+          <i class="fas fa-sliders-h"></i>
+          <span>Hero Slides</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-namdar">
+          <i class="fas fa-award"></i>
+          <span>Namdar Maharashtracha</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-streaming">
+          <i class="fas fa-play-circle"></i>
+          <span>Now Streaming (OTT)</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-showcase">
+          <i class="fas fa-images"></i>
+          <span>Showcase & Posters</span>
+        </button>
+
+        <span class="admin-nav-label">Journalism & Community</span>
+        <button class="admin-nav-item" data-tab="tab-news">
+          <i class="fas fa-newspaper"></i>
+          <span>News & Articles</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-wishes">
+          <i class="fas fa-heart"></i>
+          <span>Good Wishes Letters</span>
+        </button>
+
+        <span class="admin-nav-label">Platform Settings</span>
+        <button class="admin-nav-item" data-tab="tab-contact">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Offices & Contact Info</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-backup">
+          <i class="fas fa-database"></i>
+          <span>Backup & Sync JSON</span>
+        </button>
+      </nav>
+
+      <div class="admin-sidebar-footer">
+        <div class="admin-user-pill">
+          <div class="admin-user-avatar">VG</div>
+          <div class="admin-user-info">
+            <div class="admin-user-name">Vilas Gadge</div>
+            <div class="admin-user-role">Director & Admin</div>
+          </div>
+        </div>
+        <button id="btn-admin-logout" class="btn-sidebar-logout" title="Sign Out">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main-area">
+      <!-- Top Header -->
+      <header class="admin-top-header">
+        <div class="admin-header-left">
+          <button id="btn-mobile-sidebar-toggle" class="btn-mobile-sidebar-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="admin-page-title-wrap">
+            <h1 id="admin-current-section-title">Dashboard Overview</h1>
+            <span>Gramin Bharat TV Content Management System</span>
+          </div>
+        </div>
+
+        <div class="admin-header-actions">
+          <a href="index.html" target="_blank" class="btn-view-site" title="Open live website in a new tab">
+            <i class="fas fa-external-link-alt"></i>
+            <span>View Live Site</span>
+          </a>
+          <button id="btn-quick-export" class="btn-export-json">
+            <i class="fas fa-download"></i>
+            <span>Export JSON</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Tab Content Panels -->
+      <div class="admin-content-body">
+        
+        <!-- ===================================================================
+             TAB 1: DASHBOARD OVERVIEW
+             =================================================================== -->
+        <section id="tab-dashboard" class="admin-tab-pane active">
+          <!-- Metrics Overview Cards -->
+          <div class="metrics-overview-grid">
+            <div class="metric-card">
+              <div class="metric-icon-wrap icon-orange">
+                <i class="fas fa-award"></i>
+              </div>
+              <div class="metric-info">
+                <h3 id="metric-episodes-count">3</h3>
+                <span>Namdar Episodes</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap icon-blue">
+                <i class="fas fa-play-circle"></i>
+              </div>
+              <div class="metric-info">
+                <h3 id="metric-streaming-count">6</h3>
+                <span>Streaming Videos</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap icon-green">
+                <i class="fas fa-newspaper"></i>
+              </div>
+              <div class="metric-info">
+                <h3 id="metric-news-count">3</h3>
+                <span>Published Articles</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap icon-purple">
+                <i class="fas fa-heart"></i>
+              </div>
+              <div class="metric-info">
+                <h3 id="metric-wishes-count">3</h3>
+                <span>VIP Good Wishes</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions & Status Card -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-bolt"></i>
+                <span>Quick Platform Controls</span>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+              <div style="background: var(--admin-bg-surface); padding: 18px; border-radius: var(--admin-radius-sm); border: 1px solid var(--admin-border); display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <strong style="display: block; color: #fff; font-size: 0.95rem; margin-bottom: 2px;">Welcome Announcement Popup</strong>
+                  <span style="font-size: 0.78rem; color: var(--admin-text-muted);">Displays the official poster when visitors enter</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="dashboard-toggle-popup">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div style="background: var(--admin-bg-surface); padding: 18px; border-radius: var(--admin-radius-sm); border: 1px solid var(--admin-border); display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <strong style="display: block; color: #fff; font-size: 0.95rem; margin-bottom: 2px;">Instant Sync Status</strong>
+                  <span style="font-size: 0.78rem; color: var(--admin-success); font-weight: 700;">🟢 Local Storage Live Synchronized</span>
+                </div>
+                <button onclick="document.querySelector('[data-tab=tab-backup]').click()" class="btn-tbl-action" title="Manage Backup" style="width: auto; padding: 6px 12px; font-weight: 700;">
+                  Manage
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Content Summary Table -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-history"></i>
+                <span>Recent Platform Broadcasts</span>
+              </div>
+            </div>
+            <div class="admin-table-responsive">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-recent-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 2: ANNOUNCEMENT POPUP MODAL MANAGER
+             =================================================================== -->
+        <section id="tab-popup" class="admin-tab-pane">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-bullhorn"></i>
+                <span>Welcome Announcement Poster Popup</span>
+              </div>
+              <button id="btn-save-popup-settings" class="btn-save-changes">
+                <i class="fas fa-check"></i> Save Popup Settings
+              </button>
+            </div>
+
+            <form id="popup-settings-form">
+              <div class="admin-form-group" style="margin-bottom: 24px; background: var(--admin-bg-surface); padding: 16px; border-radius: var(--admin-radius-sm); border: 1px solid var(--admin-border); display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
+                <div>
+                  <strong style="display: block; font-size: 1rem; color: #fff;">Enable Welcome Popup on Website Load</strong>
+                  <span style="font-size: 0.8rem; color: var(--admin-text-muted);">When turned ON, the poster will smoothly display when users visit the homepage.</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="popup-enable-toggle" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="admin-form-grid">
+                <div class="admin-form-group">
+                  <label class="admin-label">Announcement Title / Caption</label>
+                  <input type="text" id="popup-title-input" class="admin-input" placeholder="e.g. नामदार महाराष्ट्राच्या मंचावर होणार खरी निवड!">
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-label">Direct Phone Call Number</label>
+                  <input type="text" id="popup-phone-input" class="admin-input" placeholder="e.g. +919987213141">
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-label">WhatsApp Contact Number</label>
+                  <input type="text" id="popup-wa-input" class="admin-input" placeholder="e.g. 919987213141">
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-label">Poster Image Source (Path or URL)</label>
+                  <input type="text" id="popup-image-input" class="admin-input" placeholder="assets/popup_poster.jpg">
+                </div>
+
+                <div class="admin-form-group form-group-full">
+                  <label class="admin-label">Upload New Poster Image</label>
+                  <input type="file" id="popup-file-upload" accept="image/*" class="admin-input">
+                  <div class="image-preview-holder" style="max-width: 320px; height: 380px;">
+                    <img id="popup-image-preview" src="assets/popup_poster.jpg" alt="Poster Preview">
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 3: HERO SLIDES MANAGER
+             =================================================================== -->
+        <section id="tab-hero" class="admin-tab-pane">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-sliders-h"></i>
+                <span>Hero Spotlight Slides</span>
+              </div>
+              <button class="btn-admin-add" onclick="openCrudModal('hero')">
+                <i class="fas fa-plus"></i> Add New Slide
+              </button>
+            </div>
+
+            <div class="admin-table-responsive">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Preview</th>
+                    <th>Tag</th>
+                    <th>Headline</th>
+                    <th>YouTube ID</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="table-hero-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 4: NAMDAR MAHARASHTRACHA EPISODES
+             =================================================================== -->
+        <section id="tab-namdar" class="admin-tab-pane">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-award"></i>
+                <span>Namdar Maharashtracha Episodes</span>
+              </div>
+              <button class="btn-admin-add" onclick="openCrudModal('namdar')">
+                <i class="fas fa-plus"></i> Add Episode
+              </button>
+            </div>
+
+            <div class="admin-table-responsive">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Thumbnail</th>
+                    <th>Tab Short Title</th>
+                    <th>Full Title</th>
+                    <th>YouTube Video ID</th>
+                    <th>Duration</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="table-namdar-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 5: NOW STREAMING (OTT HUB)
+             =================================================================== -->
+        <section id="tab-streaming" class="admin-tab-pane">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-play-circle"></i>
+                <span>Streaming Video Catalog</span>
+              </div>
+              <button class="btn-admin-add" onclick="openCrudModal('streaming')">
+                <i class="fas fa-plus"></i> Add Video
+              </button>
+            </div>
+
+            <div class="admin-table-responsive">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Poster</th>
+                    <th>Title</th>
+                    <th>Show Name</th>
+                    <th>Category</th>
+                    <th>YouTube ID</th>
+                    <th>Views</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="table-streaming-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 6: SHOWCASE & POSTERS
+             =================================================================== -->
+        <section id="tab-showcase" class="admin-tab-pane">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-images"></i>
+                <span>Signature Showcase Posters</span>
+              </div>
+              <button class="btn-admin-add" onclick="openCrudModal('showcase')">
+                <i class="fas fa-plus"></i> Add Poster
+              </button>
+            </div>
+
+            <div class="admin-table-responsive">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Poster</th>
+                    <th>Title</th>
+                    <th>Subtitle</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="table-showcase-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 7: NEWS & ARTICLES
+             =================================================================== -->
+        <section id="tab-news" class="admin-tab-pane">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-newspaper"></i>
+                <span>News & Blog Articles</span>
+              </div>
+              <button class="btn-admin-add" onclick="openCrudModal('news')">
+                <i class="fas fa-plus"></i> Publish Article
+              </button>
+            </div>
+
+            <div class="admin-table-responsive">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Headline</th>
+                    <th>Category</th>
+                    <th>Publish Date</th>
+                    <th>Author</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="table-news-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 8: GOOD WISHES LETTERS
+             =================================================================== -->
+        <section id="tab-wishes" class="admin-tab-pane">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-heart"></i>
+                <span>VIP Good Wishes & Endorsement Letters</span>
+              </div>
+              <button class="btn-admin-add" onclick="openCrudModal('wishes')">
+                <i class="fas fa-plus"></i> Add Letter
+              </button>
+            </div>
+
+            <div class="admin-table-responsive">
+              <table class="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Letter Preview</th>
+                    <th>Dignitary Name</th>
+                    <th>Designation</th>
+                    <th>Tag</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="table-wishes-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 9: OFFICES & CONTACT INFO
+             =================================================================== -->
+        <section id="tab-contact" class="admin-tab-pane">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Official Contact & Headquarters</span>
+              </div>
+              <button id="btn-save-contact-info" class="btn-save-changes">
+                <i class="fas fa-check"></i> Save Contact Details
+              </button>
+            </div>
+
+            <form id="contact-info-form" class="admin-form-grid">
+              <div class="admin-form-group">
+                <label class="admin-label">Helpline Phone Number (Display)</label>
+                <input type="text" id="contact-phone-display" class="admin-input" placeholder="+91 99872 13141">
+              </div>
+
+              <div class="admin-form-group">
+                <label class="admin-label">Helpline Phone Number (Dial Raw)</label>
+                <input type="text" id="contact-phone-raw" class="admin-input" placeholder="+919987213141">
+              </div>
+
+              <div class="admin-form-group">
+                <label class="admin-label">Official Email Address</label>
+                <input type="email" id="contact-email" class="admin-input" placeholder="info@graminbharat-tv.com">
+              </div>
+
+              <div class="admin-form-group">
+                <label class="admin-label">Founder & Director Name</label>
+                <input type="text" id="contact-founder" class="admin-input" placeholder="Vilas Gadge">
+              </div>
+
+              <div class="admin-form-group form-group-full">
+                <label class="admin-label">Nagpur Head Office Address</label>
+                <textarea id="contact-nagpur-address" class="admin-textarea" placeholder="Sneha Apartment, Plot No. 30, Banerjee Layout, Bhagwan Nagar, Nagpur, Maharashtra 440027"></textarea>
+              </div>
+
+              <div class="admin-form-group form-group-full">
+                <label class="admin-label">Mumbai Production Office Address</label>
+                <textarea id="contact-mumbai-address" class="admin-textarea" placeholder="Heera Panna Mall, Oshiwara, Andheri West, Mumbai, Maharashtra 400102"></textarea>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 10: BACKUP, RESTORE & JSON SYNC
+             =================================================================== -->
+        <section id="tab-backup" class="admin-tab-pane">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div class="admin-card-title">
+                <i class="fas fa-database"></i>
+                <span>Database Backup & Restoration</span>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+              <!-- Export Card -->
+              <div style="background: var(--admin-bg-surface); padding: 22px; border-radius: var(--admin-radius); border: 1px solid var(--admin-border);">
+                <div style="font-size: 1.8rem; color: var(--admin-info); margin-bottom: 10px;">
+                  <i class="fas fa-file-export"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 1.05rem; margin-bottom: 6px;">Download Complete Backup</h3>
+                <p style="font-size: 0.82rem; color: var(--admin-text-muted); margin-bottom: 16px;">Export all episodes, news, images, posters, and settings into a single JSON file.</p>
+                <button id="btn-backup-download" class="btn-export-json" style="width: 100%; justify-content: center;">
+                  <i class="fas fa-download"></i> Download JSON Snapshot
+                </button>
+              </div>
+
+              <!-- Import Card -->
+              <div style="background: var(--admin-bg-surface); padding: 22px; border-radius: var(--admin-radius); border: 1px solid var(--admin-border);">
+                <div style="font-size: 1.8rem; color: var(--admin-warning); margin-bottom: 10px;">
+                  <i class="fas fa-file-import"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 1.05rem; margin-bottom: 6px;">Restore from JSON File</h3>
+                <p style="font-size: 0.82rem; color: var(--admin-text-muted); margin-bottom: 16px;">Upload a previously exported `.json` file to restore your entire database.</p>
+                <input type="file" id="backup-file-upload" accept=".json" style="display: none;">
+                <button onclick="document.getElementById('backup-file-upload').click()" class="btn-save-changes" style="width: 100%; justify-content: center; background: #334155;">
+                  <i class="fas fa-upload"></i> Choose JSON File
+                </button>
+              </div>
+
+              <!-- Reset to Defaults Card -->
+              <div style="background: var(--admin-bg-surface); padding: 22px; border-radius: var(--admin-radius); border: 1px solid var(--admin-border);">
+                <div style="font-size: 1.8rem; color: var(--admin-danger); margin-bottom: 10px;">
+                  <i class="fas fa-redo-alt"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 1.05rem; margin-bottom: 6px;">Reset to Factory Defaults</h3>
+                <p style="font-size: 0.82rem; color: var(--admin-text-muted); margin-bottom: 16px;">Restore default broadcast data shipped with the platform.</p>
+                <button id="btn-backup-reset" class="btn-tbl-action btn-tbl-delete" style="width: 100%; height: 38px; font-weight: 700; border-radius: var(--admin-radius-sm);">
+                  <i class="fas fa-trash-restore"></i> Reset to Default Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       3. DYNAMIC CRUD MODAL DIALOG
+       ========================================================================= -->
+  <div id="admin-crud-modal" class="admin-modal-backdrop">
+    <div class="admin-modal-dialog">
+      <div class="admin-modal-header">
+        <h3 id="admin-crud-modal-title" class="admin-modal-title">Edit Item</h3>
+        <button id="btn-crud-modal-close" class="btn-modal-close" aria-label="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="admin-modal-body">
+        <form id="admin-crud-form">
+          <div id="admin-crud-form-fields" class="admin-form-grid">
+            <!-- Dynamically populated fields -->
+          </div>
+        </form>
+      </div>
+
+      <div class="admin-modal-footer">
+        <button id="btn-crud-modal-cancel" class="btn-modal-cancel">Cancel</button>
+        <button id="btn-crud-modal-save" class="btn-modal-save">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="admin-toast" class="admin-toast"></div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

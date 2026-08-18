@@ -348,6 +348,46 @@ const GBTV_DATA = {
     }
   ],
 
+  showcasePosters: [
+    {
+      id: 1,
+      title: "नामदार महाराष्ट्राचा – अधिकृत पोस्टर",
+      subtitle: "Shruti Films Prastut",
+      category: "Official Show",
+      image: "https://graminbharat-tv.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-13-at-5.32.51-PM.jpeg"
+    },
+    {
+      id: 2,
+      title: "गाव ते नेतृत्व – विशेष मुलाखत मालिका",
+      subtitle: "Gram Panchayat Leadership",
+      category: "Leadership",
+      image: "https://graminbharat-tv.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-13-at-5.32.50-PM-1.jpeg"
+    },
+    {
+      id: 3,
+      title: "आदर्श सरपंच सन्मान सोहळा",
+      subtitle: "State Recognition",
+      category: "Sarpanch",
+      image: "https://graminbharat-tv.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-13-at-5.32.50-PM-2.jpeg"
+    },
+    {
+      id: 4,
+      title: "मिशन जनजागृती – ग्रामीण विकास मोहीम",
+      subtitle: "Grassroots Awareness",
+      category: "Janjagruti",
+      image: "https://graminbharat-tv.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-13-at-5.32.50-PM.jpeg"
+    }
+  ],
+
+  announcementPopup: {
+    enabled: true,
+    image: "assets/popup_poster.jpg",
+    title: "नामदार महाराष्ट्राच्या मंचावर होणार खरी निवड!",
+    callNumber: "+919987213141",
+    phoneDisplay: "9987213141",
+    waNumber: "919987213141"
+  },
+
   newsBlogs: [
     {
       id: 1,
@@ -385,6 +425,49 @@ const GBTV_DATA = {
   ]
 };
 
+// ==========================================================================
+// DYNAMIC CMS STORAGE ENGINE (SYNC WITH LOCALSTORAGE)
+// ==========================================================================
+const CMS_STORAGE_KEY = "GBTV_CMS_DATA_STORE_V1";
+
+function getCmsData() {
+  try {
+    const raw = localStorage.getItem(CMS_STORAGE_KEY);
+    if (!raw) {
+      localStorage.setItem(CMS_STORAGE_KEY, JSON.stringify(GBTV_DATA));
+      return JSON.parse(JSON.stringify(GBTV_DATA));
+    }
+    const parsed = JSON.parse(raw);
+    return { ...GBTV_DATA, ...parsed };
+  } catch (e) {
+    console.error("Error reading CMS storage, using static default:", e);
+    return GBTV_DATA;
+  }
+}
+
+function saveCmsData(newData) {
+  try {
+    localStorage.setItem(CMS_STORAGE_KEY, JSON.stringify(newData));
+    return true;
+  } catch (e) {
+    console.error("Error saving CMS data:", e);
+    return false;
+  }
+}
+
+function resetCmsData() {
+  try {
+    localStorage.setItem(CMS_STORAGE_KEY, JSON.stringify(GBTV_DATA));
+    return true;
+  } catch (e) {
+    console.error("Error resetting CMS data:", e);
+    return false;
+  }
+}
+
 if (typeof window !== "undefined") {
   window.GBTV_DATA = GBTV_DATA;
+  window.getCmsData = getCmsData;
+  window.saveCmsData = saveCmsData;
+  window.resetCmsData = resetCmsData;
 }
