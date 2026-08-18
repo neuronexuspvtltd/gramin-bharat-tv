@@ -1144,11 +1144,15 @@ document.addEventListener("DOMContentLoaded", () => {
     printWindow.document.close();
   };
 
-  window.deleteRegistration = function(regId) {
+  window.deleteRegistration = function(regId, firestoreDocId = null) {
     if (!confirm("Are you sure you want to delete this registration?")) return;
-    let registrations = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
-    registrations = registrations.filter(r => r.id != regId);
-    localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(registrations));
+    if (window.gbtvFirebase && typeof window.gbtvFirebase.deleteRegistration === "function") {
+      window.gbtvFirebase.deleteRegistration(regId, firestoreDocId);
+    } else {
+      let registrations = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+      registrations = registrations.filter(r => r.id != regId);
+      localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(registrations));
+    }
     showToast("Registration entry deleted.");
     loadAdminData();
   };
@@ -1226,10 +1230,10 @@ document.addEventListener("DOMContentLoaded", () => {
                   <td>${(r.works || []).join("; ")}</td>
                   <td>${r.specialInitiatives || '-'}</td>
                   <td>${r.awards || '-'}</td>
-                  <td>${r.documentsAttached?.sarpanchPhoto || 'Attached'}</td>
-                  <td>${r.documentsAttached?.idProof || 'Attached'}</td>
-                  <td>${r.documentsAttached?.worksPhotos || 'Attached'}</td>
-                  <td>${r.documentsAttached?.certificates || 'None'}</td>
+                  <td>${r.documentsAttached?.sarpanchPhotoUrl ? 'Uploaded to Cloud' : (r.documentsAttached?.sarpanchPhoto || 'Attached')}</td>
+                  <td>${r.documentsAttached?.idProofUrl ? 'Uploaded to Cloud' : (r.documentsAttached?.idProof || 'Attached')}</td>
+                  <td>${r.documentsAttached?.worksPhotosUrls ? 'Uploaded to Cloud' : (r.documentsAttached?.worksPhotos || 'Attached')}</td>
+                  <td>${r.documentsAttached?.certificatesUrl ? 'Uploaded to Cloud' : (r.documentsAttached?.certificates || 'None')}</td>
                 </tr>
               `).join("")}
             </tbody>
@@ -1290,6 +1294,154 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.removeItem("GBTV_SARPANCH_REGISTRATIONS");
         showToast("All registrations cleared.");
         loadAdminData();
+      }
+    });
+  }
+
+  // =========================================================================
+  // FIREBASE CLOUD INTEGRATION CONTROLLER
+  // =========================================================================
+  const fbForm = document.getElementById("firebase-settings-form");
+  const fbStatusIndicator = document.getElementById("firebase-status-indicator");
+  const fbStatusText = document.getElementById("firebase-status-text");
+  const fbProjId = document.getElementById("fb-cfg-project-id");
+  const fbApiKey = document.getElementById("fb-cfg-api-key");
+  const fbAuthDomain = document.getElementById("fb-cfg-auth-domain");
+  const fbStorageBucket = document.getElementById("fb-cfg-storage-bucket");
+  const fbSenderId = document.getElementById("fb-cfg-messaging-sender-id");
+  const fbAppId = document.getElementById("fb-cfg-app-id");
+  const btnSyncToFirebase = document.getElementById("btn-sync-all-to-firebase");
+  const btnDisconnectFb = document.getElementById("btn-disconnect-firebase");
+
+  function updateFirebaseStatusUI() {
+    if (!fbStatusIndicator || !fbStatusText) return;
+    const isConfigured = window.gbtvFirebase && window.gbtvFirebase.isConfigured();
+    if (isConfigured) {
+      fbStatusIndicator.style.background = "#dcfce7";
+      fbStatusIndicator.style.color = "#15803d";
+      fbStatusIndicator.style.borderColor = "#86efac";
+      fbStatusText.innerHTML = "🟢 Cloud Sync Active";
+    } else {
+      fbStatusIndicator.style.background = "#fef08a";
+      fbStatusIndicator.style.color = "#854d0e";
+      fbStatusIndicator.style.borderColor = "#fde047";
+      fbStatusText.innerHTML = "🟡 Offline Mode (LocalStorage)";
+    }
+
+    if (window.gbtvFirebase) {
+      const cfg = window.gbtvFirebase.getConfig();
+      if (fbProjId && cfg.projectId) fbProjId.value = cfg.projectId;
+      if (fbApiKey && cfg.apiKey) fbApiKey.value = cfg.apiKey;
+      if (fbAuthDomain && cfg.authDomain) fbAuthDomain.value = cfg.authDomain;
+      if (fbStorageBucket && cfg.storageBucket) fbStorageBucket.value = cfg.storageBucket;
+      if (fbSenderId && cfg.messagingSenderId) fbSenderId.value = cfg.messagingSenderId;
+      if (fbAppId && cfg.appId) fbAppId.value = cfg.appId;
+    }
+  }
+
+  updateFirebaseStatusUI();
+
+  if (fbForm) {
+    fbForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const cfg = {
+        projectId: fbProjId?.value.trim() || "",
+        apiKey: fbApiKey?.value.trim() || "",
+        authDomain: fbAuthDomain?.value.trim() || (fbProjId?.value.trim() ? `${fbProjId.value.trim()}.firebaseapp.com` : ""),
+        storageBucket: fbStorageBucket?.value.trim() || (fbProjId?.value.trim() ? `${fbProjId.value.trim()}.appspot.com` : ""),
+        messagingSenderId: fbSenderId?.value.trim() || "",
+        appId: fbAppId?.value.trim() || ""
+      };
+
+      if (!cfg.projectId || !cfg.apiKey) {
+        alert("Please enter at least Firebase Project ID and API Key.");
+        return;
+      }
+
+      const success = window.gbtvFirebase.saveConfig(cfg);
+      updateFirebaseStatusUI();
+      if (success) {
+        showToast("🔥 Firebase connected and Cloud Sync active!");
+        loadAdminData();
+      } else {
+        showToast("⚠️ Firebase configuration saved. Connecting to Cloud...", true);
+      }
+    });
+  }
+
+  if (btnDisconnectFb) {
+    btnDisconnectFb.addEventListener("click", () => {
+      if (confirm("Disconnect Firebase and switch to LocalStorage offline mode?")) {
+        window.gbtvFirebase.clearConfig();
+        if (fbProjId) fbProjId.value = "";
+        if (fbApiKey) fbApiKey.value = "";
+        if (fbAuthDomain) fbAuthDomain.value = "";
+        if (fbStorageBucket) fbStorageBucket.value = "";
+        if (fbSenderId) fbSenderId.value = "";
+        if (fbAppId) fbAppId.value = "";
+        updateFirebaseStatusUI();
+        showToast("Switched to LocalStorage mode.");
+        loadAdminData();
+      }
+    });
+  }
+
+  if (btnSyncToFirebase) {
+    btnSyncToFirebase.addEventListener("click", async () => {
+      if (!window.gbtvFirebase || !window.gbtvFirebase.isConfigured()) {
+        alert("Please enter & save your Firebase credentials first before pushing local data.");
+        return;
+      }
+      try {
+        const cmsData = window.getCmsData();
+        await window.gbtvFirebase.saveCmsData(cmsData);
+        showToast("✓ All CMS site content pushed to Cloud Firestore!");
+      } catch (err) {
+        showToast("Sync error: " + err.message, false);
+      }
+    });
+  }
+
+  // Setup real-time listener for registrations
+  if (window.gbtvFirebase && typeof window.gbtvFirebase.listenRegistrations === "function") {
+    window.gbtvFirebase.listenRegistrations((registrations, isCloud) => {
+      const regTable = document.getElementById("table-registrations-body");
+      if (regTable) {
+        if (!registrations || registrations.length === 0) {
+          regTable.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--admin-text-dim); padding: 30px;">अद्याप कोणतीही नोंदणी प्राप्त झालेली नाही. (No registrations received yet.)</td></tr>`;
+        } else {
+          regTable.innerHTML = registrations.map((reg) => `
+            <tr>
+              <td style="font-size: 0.75rem; color: var(--admin-text-muted);">${reg.submittedAt || '-'}</td>
+              <td style="font-weight: 700; color: var(--admin-text-main);">
+                ${reg.fullName}
+                ${reg.documentsAttached?.sarpanchPhotoUrl ? `<a href="${reg.documentsAttached.sarpanchPhotoUrl}" target="_blank" title="View Uploaded Photo" style="margin-left: 6px; color: #ea580c; font-size: 0.8rem;"><i class="fas fa-image"></i></a>` : ''}
+              </td>
+              <td>
+                <a href="tel:${reg.mobile}" style="color: var(--admin-info); text-decoration: none; display: block; font-weight: 600;">📞 ${reg.mobile}</a>
+                <a href="https://wa.me/${(reg.whatsapp || '').replace(/[^0-9]/g, '')}" target="_blank" style="color: var(--admin-success); font-size: 0.76rem; text-decoration: none;">💬 WA: ${reg.whatsapp}</a>
+              </td>
+              <td>
+                <strong>${reg.village}</strong>, ${reg.taluka}, ${reg.district}
+              </td>
+              <td>
+                <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; background: ${reg.isCurrentSarpanch === 'होय' ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)'}; color: ${reg.isCurrentSarpanch === 'होय' ? 'var(--admin-success)' : 'var(--admin-warning)'};">
+                  ${reg.isCurrentSarpanch === 'होय' ? 'सध्या कार्यरत' : 'माजी सरपंच'}
+                </span>
+                ${isCloud ? '<span style="display: block; font-size: 0.65rem; color: #16a34a; margin-top: 2px;">☁️ Cloud Synced</span>' : ''}
+              </td>
+              <td>
+                <div class="table-action-btns">
+                  <button class="btn-tbl-action btn-tbl-pdf" onclick="printRegistrationPDF(${reg.id})" title="Download User Form as PDF" style="color: #ea580c; border-color: #fdba74; background: #fff7ed;">
+                    <i class="fas fa-file-pdf"></i>
+                  </button>
+                  <button class="btn-tbl-action" onclick="viewRegistrationDetail(${reg.id})" title="View Details"><i class="fas fa-eye"></i></button>
+                  <button class="btn-tbl-action btn-tbl-delete" onclick="deleteRegistration(${reg.id}, '${reg.firestoreDocId || ''}')" title="Delete Entry"><i class="fas fa-trash-alt"></i></button>
+                </div>
+              </td>
+            </tr>
+          `).join("");
+        }
       }
     });
   }

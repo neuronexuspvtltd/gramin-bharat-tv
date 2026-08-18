@@ -794,12 +794,23 @@ document.addEventListener("DOMContentLoaded", () => {
         status: "New"
       };
 
-      try {
-        const stored = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
-        stored.unshift(registrationData);
-        localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(stored));
-      } catch (err) {
-        console.error("Storage error:", err);
+      const fileMap = {
+        sarpanchPhoto: photoEl?.files?.[0] || null,
+        idProof: idProofEl?.files?.[0] || null,
+        worksPhotos: worksPhotosEl?.files ? Array.from(worksPhotosEl.files) : [],
+        certificates: certEl?.files?.[0] || null
+      };
+
+      if (window.gbtvFirebase && typeof window.gbtvFirebase.saveRegistration === "function") {
+        window.gbtvFirebase.saveRegistration(registrationData, fileMap);
+      } else {
+        try {
+          const stored = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+          stored.unshift(registrationData);
+          localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(stored));
+        } catch (err) {
+          console.error("Storage error:", err);
+        }
       }
 
       lastSubmittedRegData = registrationData;

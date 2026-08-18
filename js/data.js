@@ -448,6 +448,9 @@ function getCmsData() {
 function saveCmsData(newData) {
   try {
     localStorage.setItem(CMS_STORAGE_KEY, JSON.stringify(newData));
+    if (typeof window !== "undefined" && window.gbtvFirebase && typeof window.gbtvFirebase.saveCmsData === "function") {
+      window.gbtvFirebase.saveCmsData(newData);
+    }
     return true;
   } catch (e) {
     console.error("Error saving CMS data:", e);
@@ -458,6 +461,9 @@ function saveCmsData(newData) {
 function resetCmsData() {
   try {
     localStorage.setItem(CMS_STORAGE_KEY, JSON.stringify(GBTV_DATA));
+    if (typeof window !== "undefined" && window.gbtvFirebase && typeof window.gbtvFirebase.saveCmsData === "function") {
+      window.gbtvFirebase.saveCmsData(GBTV_DATA);
+    }
     return true;
   } catch (e) {
     console.error("Error resetting CMS data:", e);
