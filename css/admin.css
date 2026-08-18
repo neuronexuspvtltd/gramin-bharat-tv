@@ -702,6 +702,13 @@ body.admin-body {
   color: var(--admin-text-main);
 }
 
+.btn-tbl-pdf:hover {
+  background: #ffedd5 !important;
+  border-color: #ea580c !important;
+  color: #ea580c !important;
+  transform: scale(1.08);
+}
+
 .btn-tbl-delete:hover {
   background: #fee2e2;
   border-color: #fca5a5;

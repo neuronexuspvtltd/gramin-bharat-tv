@@ -412,6 +412,299 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // =========================================================================
+  // SARPANCH FORM DATA & PDF DOWNLOAD ENGINE
+  // =========================================================================
+  const namdarSuccessModal = document.getElementById("namdar-success-modal");
+  const btnSuccessDownload = document.getElementById("btn-success-download-pdf");
+  const btnSuccessClose = document.getElementById("btn-success-close-modal");
+  const btnDownloadDraft = document.getElementById("btn-download-draft-form");
+  let lastSubmittedRegData = null;
+
+  function getCurrentFormData() {
+    const photoEl = document.getElementById("upload-sarpanch-photo");
+    const idProofEl = document.getElementById("upload-id-proof");
+    const worksPhotosEl = document.getElementById("upload-works-photos");
+    const certEl = document.getElementById("upload-certificates");
+
+    return {
+      regId: `GBTV-SARPANCH-2026-${Math.floor(10000 + Math.random() * 90000)}`,
+      submittedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" }),
+      fullName: document.getElementById("reg-fullname")?.value.trim() || "अर्जदार सरपंच",
+      mobile: document.getElementById("reg-mobile")?.value.trim() || "-",
+      whatsapp: document.getElementById("reg-whatsapp")?.value.trim() || "-",
+      email: document.getElementById("reg-email")?.value.trim() || "-",
+      education: document.getElementById("reg-education")?.value.trim() || "-",
+      village: document.getElementById("reg-village")?.value.trim() || "-",
+      taluka: document.getElementById("reg-taluka")?.value.trim() || "-",
+      district: document.getElementById("reg-district")?.value.trim() || "-",
+      pincode: document.getElementById("reg-pincode")?.value.trim() || "-",
+      address: document.getElementById("reg-address")?.value.trim() || "-",
+      isCurrentSarpanch: document.querySelector("input[name='reg-is-current']:checked")?.value || "होय",
+      tenureFrom: document.getElementById("reg-tenure-from")?.value.trim() || "-",
+      tenureTo: document.getElementById("reg-tenure-to")?.value.trim() || "-",
+      totalYears: document.getElementById("reg-total-years")?.value.trim() || "-",
+      works: [
+        document.getElementById("reg-work-1")?.value.trim(),
+        document.getElementById("reg-work-2")?.value.trim(),
+        document.getElementById("reg-work-3")?.value.trim(),
+        document.getElementById("reg-work-4")?.value.trim(),
+        document.getElementById("reg-work-5")?.value.trim()
+      ].filter(Boolean),
+      specialInitiatives: document.getElementById("reg-special-initiatives")?.value.trim() || "काही नाही",
+      awards: document.getElementById("reg-awards")?.value.trim() || "काही नाही",
+      documentsAttached: {
+        sarpanchPhoto: photoEl?.files?.[0]?.name || "जोडले नाही",
+        idProof: idProofEl?.files?.[0]?.name || "जोडले नाही",
+        worksPhotos: Array.from(worksPhotosEl?.files || []).map(f => f.name).join(", ") || "जोडले नाही",
+        certificates: certEl?.files?.[0]?.name || "जोडले नाही"
+      }
+    };
+  }
+
+  function printOrDownloadApplicationForm(regData) {
+    const data = regData || lastSubmittedRegData || getCurrentFormData();
+    const printWindow = window.open("", "_blank", "width=850,height=1000");
+    if (!printWindow) {
+      alert("कृपया पॉप-अप ब्लॉकर तपासा जेणेकरून फॉर्म प्रिंट/डाउनलोड करता येईल.");
+      return;
+    }
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="mr">
+      <head>
+        <meta charset="UTF-8">
+        <title>नामदार महाराष्ट्राचा - अधिकृत नोंदणी अर्ज (${data.fullName})</title>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+        <style>
+          * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans Devanagari', -apple-system, sans-serif; }
+          body { background: #ffffff; color: #0f172a; padding: 24px; font-size: 13px; line-height: 1.4; }
+          .form-header { border: 2px solid #ea580c; border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; background: #fff7ed; display: flex; align-items: center; justify-content: space-between; }
+          .header-left h1 { font-size: 18px; font-weight: 900; color: #c2410c; margin-bottom: 2px; }
+          .header-left h2 { font-size: 14px; font-weight: 800; color: #0f172a; }
+          .header-left p { font-size: 11px; color: #475569; }
+          .header-right { text-align: right; }
+          .reg-badge { display: inline-block; background: #ea580c; color: #ffffff; font-weight: 800; padding: 4px 10px; border-radius: 6px; font-size: 12px; }
+          .reg-date { font-size: 10px; color: #64748b; margin-top: 3px; }
+          .prize-strip { background: linear-gradient(90deg, #fef3c7 0%, #ffedd5 100%); border: 1px solid #f59e0b; border-radius: 8px; padding: 8px 12px; margin-bottom: 14px; text-align: center; font-weight: 800; font-size: 11px; color: #b45309; }
+          
+          .form-section { border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 12px; overflow: hidden; page-break-inside: avoid; }
+          .section-title { background: #f1f5f9; padding: 6px 12px; font-size: 12px; font-weight: 800; color: #0f172a; border-bottom: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: space-between; }
+          .data-table { width: 100%; border-collapse: collapse; }
+          .data-table td { padding: 6px 10px; font-size: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+          .data-table tr:last-child td { border-bottom: none; }
+          .data-label { width: 28%; font-weight: 700; color: #475569; background: #fafafa; }
+          .data-val { width: 72%; font-weight: 600; color: #0f172a; }
+          
+          .works-list { padding: 8px 14px 8px 28px; }
+          .works-list li { margin-bottom: 4px; font-size: 12px; }
+          
+          .declaration-box { background: #fff7ed; border: 1px dashed #fdba74; border-radius: 8px; padding: 10px 14px; font-size: 11px; color: #7c2d12; line-height: 1.45; margin-bottom: 14px; page-break-inside: avoid; }
+          .sign-area { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; padding-top: 14px; border-top: 1px solid #e2e8f0; page-break-inside: avoid; }
+          .sign-box { text-align: center; width: 200px; }
+          .sign-line { border-bottom: 1px solid #0f172a; margin-bottom: 6px; height: 35px; }
+          .sign-lbl { font-size: 11px; font-weight: 700; color: #475569; }
+          
+          .form-footer { margin-top: 14px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 8px; }
+          
+          @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="form-header">
+          <div class="header-left">
+            <p>🚩 श्रुती फिल्म्स व ग्रामीण भारत टीव्ही प्रस्तुत</p>
+            <h1>नामदार महाराष्ट्राचा - सरपंच सन्मान</h1>
+            <h2>अधिकृत नोंदणी अर्ज (Official Registration Form)</h2>
+          </div>
+          <div class="header-right">
+            <span class="reg-badge">${data.regId || ('GBTV-' + Date.now().toString().slice(-6))}</span>
+            <div class="reg-date">अर्ज दिनांक: ${data.submittedAt}</div>
+          </div>
+        </div>
+
+        <div class="prize-strip">
+          🏆 प्रथम बक्षिस: ₹११ लाख + ट्रॅक्टर 🚜 | द्वितीय: ₹७ लाख + ॲम्बुलन्स 🚑 | तृतीय: ₹५ लाख + पिठाची गिरणी 🌾
+        </div>
+
+        <!-- Section 1 -->
+        <div class="form-section">
+          <div class="section-title">१. वैयक्तिक माहिती (Personal Details)</div>
+          <table class="data-table">
+            <tr>
+              <td class="data-label">सरपंच पूर्ण नाव:</td>
+              <td class="data-val"><strong>${data.fullName}</strong></td>
+            </tr>
+            <tr>
+              <td class="data-label">मोबाईल व व्हॉट्सअॅप:</td>
+              <td class="data-val">📞 ${data.mobile} | 💬 WhatsApp: ${data.whatsapp || '-'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">ईमेल आयडी:</td>
+              <td class="data-val">${data.email || '-'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">शिक्षण / व्यवसाय:</td>
+              <td class="data-val">${data.education || '-'}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="form-section">
+          <div class="section-title">२. गावाची माहिती (Village Details)</div>
+          <table class="data-table">
+            <tr>
+              <td class="data-label">गाव व तालुका:</td>
+              <td class="data-val"><strong>${data.village}</strong>, तालुका: ${data.taluka}</td>
+            </tr>
+            <tr>
+              <td class="data-label">जिल्हा व पिनकोड:</td>
+              <td class="data-val">${data.district} - ${data.pincode || '-'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">संपूर्ण पत्ता:</td>
+              <td class="data-val">${data.address || '-'}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="form-section">
+          <div class="section-title">३. सरपंच पदाची माहिती (Tenure Details)</div>
+          <table class="data-table">
+            <tr>
+              <td class="data-label">सध्या कार्यरत सरपंच?</td>
+              <td class="data-val"><strong>${data.isCurrentSarpanch}</strong></td>
+            </tr>
+            <tr>
+              <td class="data-label">पदाचा कार्यकाळ:</td>
+              <td class="data-val">${data.tenureFrom || '-'} ते ${data.tenureTo || '-'} (एकूण: ${data.totalYears || '-'})</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="form-section">
+          <div class="section-title">४. गावासाठी केलेली प्रमुख विकासकामे (Key Works)</div>
+          <ol class="works-list">
+            ${(data.works && data.works.length > 0) 
+              ? data.works.map(w => `<li>${w}</li>`).join("")
+              : "<li>कोणतीही कामे नमूद केलेली नाहीत.</li>"}
+          </ol>
+        </div>
+
+        <!-- Section 5 & 6 -->
+        <div class="form-section">
+          <div class="section-title">५. विशेष कामगिरी व पुरस्कार (Special Initiatives & Honors)</div>
+          <table class="data-table">
+            <tr>
+              <td class="data-label">विशेष उपक्रम:</td>
+              <td class="data-val">${data.specialInitiatives || 'काही नाही'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">मिळालेले पुरस्कार:</td>
+              <td class="data-val">${data.awards || 'काही नाही'}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="form-section">
+          <div class="section-title">६. जोडलेली कागदपत्रे (Attached Documents Status)</div>
+          <table class="data-table">
+            <tr>
+              <td class="data-label">सरपंच फोटो:</td>
+              <td class="data-val">✓ ${data.documentsAttached?.sarpanchPhoto || 'जोडले आहे'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">ओळखपत्र (आधार):</td>
+              <td class="data-val">✓ ${data.documentsAttached?.idProof || 'जोडले आहे'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">विकासकामे फोटो:</td>
+              <td class="data-val">✓ ${data.documentsAttached?.worksPhotos || 'जोडले आहे'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">प्रमाणपत्रे:</td>
+              <td class="data-val">✓ ${data.documentsAttached?.certificates || 'जोडले आहे'}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Declaration & Sign -->
+        <div class="declaration-box">
+          <strong>घोषणा:</strong> मी याद्वारे घोषित करतो/करते की वर दिलेली सर्व माहिती व कागदपत्रे माझ्या माहितीनुसार सत्य व बरोबर आहेत. मी 'नामदार महाराष्ट्राचा' या शोमध्ये सहभागी होण्यासाठी पूर्णपणे सहमत आहे.
+        </div>
+
+        <div class="sign-area">
+          <div class="sign-box">
+            <div class="sign-line"></div>
+            <div class="sign-lbl">अर्जदार सरपंच स्वाक्षरी</div>
+          </div>
+          <div class="sign-box" style="text-align: right;">
+            <div style="font-weight: 800; color: #c2410c; font-size: 13px;">ग्रामीण भारत टीव्ही</div>
+            <div style="font-size: 11px; color: #475569;">अधिकृत छाननी व तपासणी कक्ष</div>
+            <div style="font-size: 10px; color: #16a34a; font-weight: 700; margin-top: 4px;">हेल्पलाईन: 9987213141</div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          Gramin Bharat TV (ग्रामीण भारत टीव्ही) - Vilas Gadge | अधिकृत संकेतस्थळ: https://graminbharat-tv.com
+        </div>
+
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 400);
+          };
+        <\/script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  }
+
+  // Draft Download Button (Inside Form)
+  if (btnDownloadDraft) {
+    btnDownloadDraft.addEventListener("click", () => {
+      const data = getCurrentFormData();
+      printOrDownloadApplicationForm(data);
+    });
+  }
+
+  // Success Modal Actions
+  if (btnSuccessDownload) {
+    btnSuccessDownload.addEventListener("click", () => {
+      printOrDownloadApplicationForm(lastSubmittedRegData);
+    });
+  }
+
+  function closeSuccessModal() {
+    if (namdarSuccessModal) {
+      namdarSuccessModal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  }
+
+  if (btnSuccessClose) {
+    btnSuccessClose.addEventListener("click", closeSuccessModal);
+  }
+
+  if (namdarSuccessModal) {
+    namdarSuccessModal.addEventListener("click", (e) => {
+      if (e.target === namdarSuccessModal) closeSuccessModal();
+    });
+  }
+
   // Handle Online Form Submission
   if (sarpanchForm) {
     sarpanchForm.addEventListener("submit", (e) => {
@@ -429,9 +722,13 @@ document.addEventListener("DOMContentLoaded", () => {
         certificates: certEl?.files?.[0]?.name || "Not attached"
       };
 
+      const registrationId = `GBTV-SARPANCH-2026-${Math.floor(10000 + Math.random() * 90000)}`;
+      const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
+
       const registrationData = {
         id: Date.now(),
-        submittedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+        regId: registrationId,
+        submittedAt: timestamp,
         fullName: document.getElementById("reg-fullname")?.value.trim() || "",
         mobile: document.getElementById("reg-mobile")?.value.trim() || "",
         whatsapp: document.getElementById("reg-whatsapp")?.value.trim() || "",
@@ -467,7 +764,29 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Storage error:", err);
       }
 
-      showToast("✅ तुमची नोंदणी व कागदपत्रे यशस्वीरित्या सबमिट झाली आहेत! लवकरच आमची टीम संपर्क साधेल.");
+      lastSubmittedRegData = registrationData;
+
+      // Update receipt modal
+      const receiptRegId = document.getElementById("receipt-reg-id");
+      const receiptName = document.getElementById("receipt-applicant-name");
+      const receiptVillage = document.getElementById("receipt-village-info");
+      const receiptMobile = document.getElementById("receipt-mobile");
+      const receiptTime = document.getElementById("receipt-timestamp");
+
+      if (receiptRegId) receiptRegId.textContent = registrationId;
+      if (receiptName) receiptName.textContent = registrationData.fullName;
+      if (receiptVillage) receiptVillage.textContent = `${registrationData.village}, ${registrationData.taluka}, ${registrationData.district}`;
+      if (receiptMobile) receiptMobile.textContent = registrationData.mobile;
+      if (receiptTime) receiptTime.textContent = timestamp;
+
+      // Close registration form modal & open success receipt modal
+      closeNamdarModal();
+      if (namdarSuccessModal) {
+        namdarSuccessModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      showToast("✅ तुमची नोंदणी यशस्वीरित्या सबमिट झाली आहे!");
       sarpanchForm.reset();
       fileUploadInputs.forEach(item => {
         const statusEl = document.getElementById(item.statusId);
@@ -475,45 +794,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (statusEl) statusEl.textContent = "कोणतीही फाइल निवडलेली नाही";
         if (box) box.classList.remove("has-file");
       });
-      closeNamdarModal();
-    });
-  }
-
-  // Handle WhatsApp Direct Send
-  if (btnSubmitWa) {
-    btnSubmitWa.addEventListener("click", () => {
-      const name = document.getElementById("reg-fullname")?.value.trim() || "सरपंच";
-      const mobile = document.getElementById("reg-mobile")?.value.trim() || "-";
-      const wa = document.getElementById("reg-whatsapp")?.value.trim() || "-";
-      const village = document.getElementById("reg-village")?.value.trim() || "-";
-      const taluka = document.getElementById("reg-taluka")?.value.trim() || "-";
-      const dist = document.getElementById("reg-district")?.value.trim() || "-";
-      const work1 = document.getElementById("reg-work-1")?.value.trim() || "-";
-      const work2 = document.getElementById("reg-work-2")?.value.trim() || "-";
-      const special = document.getElementById("reg-special-initiatives")?.value.trim() || "-";
-      const awards = document.getElementById("reg-awards")?.value.trim() || "-";
-
-      const waMsg = `*🚩 नामदार महाराष्ट्राचा - अधिकृत नोंदणी फॉर्म 🚩*\n` +
-        `----------------------------------------\n` +
-        `👤 *सरपंच नाव:* ${name}\n` +
-        `📱 *मोबाईल:* ${mobile}\n` +
-        `💬 *व्हॉट्सअॅप:* ${wa}\n` +
-        `🏡 *गाव:* ${village}\n` +
-        `📍 *तालुका:* ${taluka} | *जिल्हा:* ${dist}\n` +
-        `🛠️ *प्रमुख कामे:* 1) ${work1}, 2) ${work2}\n` +
-        `⭐ *विशेष उपक्रम:* ${special}\n` +
-        `🏆 *पुरस्कार:* ${awards}\n` +
-        `----------------------------------------\n` +
-        `_मी नामदार महाराष्ट्राचा स्पर्धेत सहभागी होण्यासाठी नोंदणी करत आहे. धन्यवाद!_`;
-
-      const encoded = encodeURIComponent(waMsg);
-      window.open(`https://wa.me/919987213141?text=${encoded}`, "_blank");
     });
   }
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeNamdarModal();
+      closeSuccessModal();
       closeWelcomePopup();
       closeVideoModal();
       closeSearchModal();

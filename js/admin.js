@@ -313,6 +313,9 @@ document.addEventListener("DOMContentLoaded", () => {
             </td>
             <td>
               <div class="table-action-btns">
+                <button class="btn-tbl-action" onclick="printRegistrationPDF(${reg.id})" title="Download User Form as PDF" style="color: #ea580c; border-color: #fdba74; background: #fff7ed;">
+                  <i class="fas fa-file-pdf"></i>
+                </button>
                 <button class="btn-tbl-action" onclick="viewRegistrationDetail(${reg.id})" title="View Details"><i class="fas fa-eye"></i></button>
                 <button class="btn-tbl-action btn-tbl-delete" onclick="deleteRegistration(${reg.id})" title="Delete Entry"><i class="fas fa-trash-alt"></i></button>
               </div>
@@ -854,10 +857,226 @@ document.addEventListener("DOMContentLoaded", () => {
           <div><strong>4. Certificates:</strong> <span style="color: var(--admin-info);">${reg.documentsAttached?.certificates || 'None'}</span></div>
         </div>
       </div>
+      <div class="admin-form-group form-group-full" style="margin-top: 8px;">
+        <button type="button" class="btn-save-changes" onclick="printRegistrationPDF(${reg.id})" style="width: 100%; justify-content: center; background: linear-gradient(90deg, #ea580c 0%, #c2410c 100%);">
+          <i class="fas fa-file-pdf"></i> Download / Print Official Application PDF
+        </button>
+      </div>
     `;
 
     crudModalSaveBtn.style.display = "none";
     crudModal.classList.add("open");
+  };
+
+  window.printRegistrationPDF = function(regId) {
+    const registrations = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+    const data = registrations.find(r => r.id == regId);
+    if (!data) return;
+
+    const printWindow = window.open("", "_blank", "width=850,height=1000");
+    if (!printWindow) return;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="mr">
+      <head>
+        <meta charset="UTF-8">
+        <title>नामदार महाराष्ट्राचा - अधिकृत नोंदणी अर्ज (${data.fullName})</title>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+        <style>
+          * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans Devanagari', -apple-system, sans-serif; }
+          body { background: #ffffff; color: #0f172a; padding: 24px; font-size: 13px; line-height: 1.4; }
+          .form-header { border: 2px solid #ea580c; border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; background: #fff7ed; display: flex; align-items: center; justify-content: space-between; }
+          .header-left h1 { font-size: 18px; font-weight: 900; color: #c2410c; margin-bottom: 2px; }
+          .header-left h2 { font-size: 14px; font-weight: 800; color: #0f172a; }
+          .header-left p { font-size: 11px; color: #475569; }
+          .header-right { text-align: right; }
+          .reg-badge { display: inline-block; background: #ea580c; color: #ffffff; font-weight: 800; padding: 4px 10px; border-radius: 6px; font-size: 12px; }
+          .reg-date { font-size: 10px; color: #64748b; margin-top: 3px; }
+          .prize-strip { background: linear-gradient(90deg, #fef3c7 0%, #ffedd5 100%); border: 1px solid #f59e0b; border-radius: 8px; padding: 8px 12px; margin-bottom: 14px; text-align: center; font-weight: 800; font-size: 11px; color: #b45309; }
+          
+          .form-section { border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 12px; overflow: hidden; page-break-inside: avoid; }
+          .section-title { background: #f1f5f9; padding: 6px 12px; font-size: 12px; font-weight: 800; color: #0f172a; border-bottom: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: space-between; }
+          .data-table { width: 100%; border-collapse: collapse; }
+          .data-table td { padding: 6px 10px; font-size: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+          .data-table tr:last-child td { border-bottom: none; }
+          .data-label { width: 28%; font-weight: 700; color: #475569; background: #fafafa; }
+          .data-val { width: 72%; font-weight: 600; color: #0f172a; }
+          
+          .works-list { padding: 8px 14px 8px 28px; }
+          .works-list li { margin-bottom: 4px; font-size: 12px; }
+          
+          .declaration-box { background: #fff7ed; border: 1px dashed #fdba74; border-radius: 8px; padding: 10px 14px; font-size: 11px; color: #7c2d12; line-height: 1.45; margin-bottom: 14px; page-break-inside: avoid; }
+          .sign-area { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; padding-top: 14px; border-top: 1px solid #e2e8f0; page-break-inside: avoid; }
+          .sign-box { text-align: center; width: 200px; }
+          .sign-line { border-bottom: 1px solid #0f172a; margin-bottom: 6px; height: 35px; }
+          .sign-lbl { font-size: 11px; font-weight: 700; color: #475569; }
+          
+          .form-footer { margin-top: 14px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 8px; }
+          
+          @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="form-header">
+          <div class="header-left">
+            <p>🚩 श्रुती फिल्म्स व ग्रामीण भारत टीव्ही प्रस्तुत</p>
+            <h1>नामदार महाराष्ट्राचा - सरपंच सन्मान</h1>
+            <h2>अधिकृत नोंदणी अर्ज (Official Registration Form)</h2>
+          </div>
+          <div class="header-right">
+            <span class="reg-badge">${data.regId || ('GBTV-' + data.id.toString().slice(-6))}</span>
+            <div class="reg-date">अर्ज दिनांक: ${data.submittedAt}</div>
+          </div>
+        </div>
+
+        <div class="prize-strip">
+          🏆 प्रथम बक्षिस: ₹११ लाख + ट्रॅक्टर 🚜 | द्वितीय: ₹७ लाख + ॲम्बुलन्स 🚑 | तृतीय: ₹५ लाख + पिठाची गिरणी 🌾
+        </div>
+
+        <!-- Section 1 -->
+        <div class="form-section">
+          <div class="section-title">१. वैयक्तिक माहिती (Personal Details)</div>
+          <table class="data-table">
+            <tr>
+              <td class="data-label">सरपंच पूर्ण नाव:</td>
+              <td class="data-val"><strong>${data.fullName}</strong></td>
+            </tr>
+            <tr>
+              <td class="data-label">मोबाईल व व्हॉट्सअॅप:</td>
+              <td class="data-val">📞 ${data.mobile} | 💬 WhatsApp: ${data.whatsapp || '-'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">ईमेल आयडी:</td>
+              <td class="data-val">${data.email || '-'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">शिक्षण / व्यवसाय:</td>
+              <td class="data-val">${data.education || '-'}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="form-section">
+          <div class="section-title">२. गावाची माहिती (Village Details)</div>
+          <table class="data-table">
+            <tr>
+              <td class="data-label">गाव व तालुका:</td>
+              <td class="data-val"><strong>${data.village}</strong>, तालुका: ${data.taluka}</td>
+            </tr>
+            <tr>
+              <td class="data-label">जिल्हा व पिनकोड:</td>
+              <td class="data-val">${data.district} - ${data.pincode || '-'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">संपूर्ण पत्ता:</td>
+              <td class="data-val">${data.address || '-'}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="form-section">
+          <div class="section-title">३. सरपंच पदाची माहिती (Tenure Details)</div>
+          <table class="data-table">
+            <tr>
+              <td class="data-label">सध्या कार्यरत सरपंच?</td>
+              <td class="data-val"><strong>${data.isCurrentSarpanch}</strong></td>
+            </tr>
+            <tr>
+              <td class="data-label">पदाचा कार्यकाळ:</td>
+              <td class="data-val">${data.tenureFrom || '-'} ते ${data.tenureTo || '-'} (एकूण: ${data.totalYears || '-'})</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="form-section">
+          <div class="section-title">४. गावासाठी केलेली प्रमुख विकासकामे (Key Works)</div>
+          <ol class="works-list">
+            ${(data.works && data.works.length > 0) 
+              ? data.works.map(w => `<li>${w}</li>`).join("")
+              : "<li>कोणतीही कामे नमूद केलेली नाहीत.</li>"}
+          </ol>
+        </div>
+
+        <!-- Section 5 & 6 -->
+        <div class="form-section">
+          <div class="section-title">५. विशेष कामगिरी व पुरस्कार (Special Initiatives & Honors)</div>
+          <table class="data-table">
+            <tr>
+              <td class="data-label">विशेष उपक्रम:</td>
+              <td class="data-val">${data.specialInitiatives || 'काही नाही'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">मिळालेले पुरस्कार:</td>
+              <td class="data-val">${data.awards || 'काही नाही'}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="form-section">
+          <div class="section-title">६. जोडलेली कागदपत्रे (Attached Documents Status)</div>
+          <table class="data-table">
+            <tr>
+              <td class="data-label">सरपंच फोटो:</td>
+              <td class="data-val">✓ ${data.documentsAttached?.sarpanchPhoto || 'जोडले आहे'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">ओळखपत्र (आधार):</td>
+              <td class="data-val">✓ ${data.documentsAttached?.idProof || 'जोडले आहे'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">विकासकामे फोटो:</td>
+              <td class="data-val">✓ ${data.documentsAttached?.worksPhotos || 'जोडले आहे'}</td>
+            </tr>
+            <tr>
+              <td class="data-label">प्रमाणपत्रे:</td>
+              <td class="data-val">✓ ${data.documentsAttached?.certificates || 'जोडले आहे'}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Declaration & Sign -->
+        <div class="declaration-box">
+          <strong>घोषणा:</strong> मी याद्वारे घोषित करतो/करते की वर दिलेली सर्व माहिती व कागदपत्रे माझ्या माहितीनुसार सत्य व बरोबर आहेत. मी 'नामदार महाराष्ट्राचा' या शोमध्ये सहभागी होण्यासाठी पूर्णपणे सहमत आहे.
+        </div>
+
+        <div class="sign-area">
+          <div class="sign-box">
+            <div class="sign-line"></div>
+            <div class="sign-lbl">अर्जदार सरपंच स्वाक्षरी</div>
+          </div>
+          <div class="sign-box" style="text-align: right;">
+            <div style="font-weight: 800; color: #c2410c; font-size: 13px;">ग्रामीण भारत टीव्ही</div>
+            <div style="font-size: 11px; color: #475569;">अधिकृत छाननी व तपासणी कक्ष</div>
+            <div style="font-size: 10px; color: #16a34a; font-weight: 700; margin-top: 4px;">हेल्पलाईन: 9987213141</div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          Gramin Bharat TV (ग्रामीण भारत टीव्ही) - Vilas Gadge | अधिकृत संकेतस्थळ: https://graminbharat-tv.com
+        </div>
+
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 300);
+          };
+        <\/script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   };
 
   window.deleteRegistration = function(regId) {
@@ -868,6 +1087,104 @@ document.addEventListener("DOMContentLoaded", () => {
     showToast("Registration entry deleted.");
     loadAdminData();
   };
+
+  // Export Excel (.xls / .xlsx formatted HTML table)
+  const btnExportExcel = document.getElementById("btn-export-registrations-excel");
+  if (btnExportExcel) {
+    btnExportExcel.addEventListener("click", () => {
+      const registrations = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+      if (registrations.length === 0) {
+        alert("No registrations available to export.");
+        return;
+      }
+
+      let html = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+          <meta charset="utf-8">
+          <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Sarpanch Registrations</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+          <style>
+            th { background-color: #ea580c; color: #ffffff; font-weight: bold; border: 1px solid #cbd5e1; padding: 10px; text-align: left; }
+            td { border: 1px solid #cbd5e1; padding: 8px; font-size: 11pt; }
+            .title-cell { font-size: 14pt; font-weight: bold; color: #c2410c; }
+          </style>
+        </head>
+        <body>
+          <table>
+            <tr><td colspan="15" class="title-cell">Gramin Bharat TV - Namdar Maharashtracha Sarpanch Registrations</td></tr>
+            <tr><td colspan="15">Export Date: ${new Date().toLocaleString("en-IN")}</td></tr>
+            <tr></tr>
+            <thead>
+              <tr>
+                <th>Ref Application ID</th>
+                <th>Submission Timestamp</th>
+                <th>Sarpanch Full Name</th>
+                <th>Mobile Number</th>
+                <th>WhatsApp Number</th>
+                <th>Email Address</th>
+                <th>Education / Profession</th>
+                <th>Village Name</th>
+                <th>Taluka</th>
+                <th>District</th>
+                <th>Pincode</th>
+                <th>Full Address</th>
+                <th>Active Sarpanch?</th>
+                <th>Tenure Period</th>
+                <th>Total Duration</th>
+                <th>5 Key Village Works</th>
+                <th>Special Initiatives</th>
+                <th>Awards & Honors</th>
+                <th>Sarpanch Photo</th>
+                <th>ID Proof</th>
+                <th>Works Photos</th>
+                <th>Certificates</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${registrations.map(r => `
+                <tr>
+                  <td>${r.regId || ('GBTV-' + (r.id || '').toString().slice(-6))}</td>
+                  <td>${r.submittedAt || '-'}</td>
+                  <td><strong>${r.fullName || ''}</strong></td>
+                  <td style="mso-number-format:'\\@';">${r.mobile || ''}</td>
+                  <td style="mso-number-format:'\\@';">${r.whatsapp || ''}</td>
+                  <td>${r.email || '-'}</td>
+                  <td>${r.education || '-'}</td>
+                  <td><strong>${r.village || ''}</strong></td>
+                  <td>${r.taluka || ''}</td>
+                  <td>${r.district || ''}</td>
+                  <td style="mso-number-format:'\\@';">${r.pincode || '-'}</td>
+                  <td>${r.address || '-'}</td>
+                  <td>${r.isCurrentSarpanch || 'होय'}</td>
+                  <td>${r.tenureFrom || '-'} to ${r.tenureTo || '-'}</td>
+                  <td>${r.totalYears || '-'}</td>
+                  <td>${(r.works || []).join("; ")}</td>
+                  <td>${r.specialInitiatives || '-'}</td>
+                  <td>${r.awards || '-'}</td>
+                  <td>${r.documentsAttached?.sarpanchPhoto || 'Attached'}</td>
+                  <td>${r.documentsAttached?.idProof || 'Attached'}</td>
+                  <td>${r.documentsAttached?.worksPhotos || 'Attached'}</td>
+                  <td>${r.documentsAttached?.certificates || 'None'}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(["\uFEFF" + html], { type: "application/vnd.ms-excel;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Sarpanch_Registrations_${new Date().toISOString().slice(0,10)}.xls`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast("Registrations Excel spreadsheet (.xls) downloaded successfully!");
+    });
+  }
 
   // Export CSV
   const btnExportCsv = document.getElementById("btn-export-registrations-csv");
