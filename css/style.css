@@ -4133,6 +4133,29 @@ textarea.form-control {
   box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
 }
 
+.input-field-wrap input.input-invalid,
+.form-group input.input-invalid {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+}
+
+.input-field-wrap input.input-valid,
+.form-group input.input-valid {
+  border-color: #22c55e !important;
+  background-color: #f0fdf4 !important;
+}
+
+.field-error-msg {
+  color: #dc2626;
+  font-size: 0.74rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
 .radio-options-row {
   display: flex;
   gap: 16px;

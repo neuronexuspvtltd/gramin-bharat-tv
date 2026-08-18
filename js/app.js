@@ -740,6 +740,94 @@ document.addEventListener("DOMContentLoaded", () => {
     printWindow.document.close();
   }
 
+  // =========================================================================
+  // MOBILE NUMBER VALIDATION UTILITY
+  // =========================================================================
+  function isValidIndianMobile(number) {
+    if (!number) return false;
+    const clean = number.toString().replace(/[^0-9]/g, "");
+    // Must be exactly 10 digits starting with 6, 7, 8, or 9
+    if (!/^[6-9]\d{9}$/.test(clean)) {
+      return false;
+    }
+    // Reject repeated digits (e.g. 9999999999, 0000000000)
+    if (/^(\d)\1{9}$/.test(clean)) {
+      return false;
+    }
+    return true;
+  }
+
+  function setupMobileInputValidation(inputId, errorId, labelName = "मोबाईल नंबर") {
+    const input = document.getElementById(inputId);
+    const errorEl = document.getElementById(errorId);
+    if (!input) return;
+
+    input.addEventListener("input", () => {
+      // Restrict strictly to digits
+      input.value = input.value.replace(/[^0-9]/g, "").slice(0, 10);
+      const val = input.value;
+
+      if (val.length === 10) {
+        if (isValidIndianMobile(val)) {
+          input.classList.remove("input-invalid");
+          input.classList.add("input-valid");
+          if (errorEl) {
+            errorEl.style.display = "none";
+            errorEl.textContent = "";
+          }
+        } else {
+          input.classList.add("input-invalid");
+          input.classList.remove("input-valid");
+          if (errorEl) {
+            errorEl.style.display = "flex";
+            errorEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> अवैध ${labelName}. (6, 7, 8 किंवा 9 ने सुरू होणारा १०-अंकी नंबर असावा)`;
+          }
+        }
+      } else {
+        input.classList.remove("input-valid");
+        if (val.length === 0) {
+          input.classList.remove("input-invalid");
+          if (errorEl) errorEl.style.display = "none";
+        }
+      }
+    });
+
+    input.addEventListener("blur", () => {
+      const val = input.value.trim();
+      if (!val) {
+        if (input.hasAttribute("required")) {
+          input.classList.add("input-invalid");
+          if (errorEl) {
+            errorEl.style.display = "flex";
+            errorEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${labelName} टाकणे आवश्यक आहे.`;
+          }
+        }
+        return;
+      }
+
+      if (!isValidIndianMobile(val)) {
+        input.classList.add("input-invalid");
+        input.classList.remove("input-valid");
+        if (errorEl) {
+          errorEl.style.display = "flex";
+          if (val.length < 10) {
+            errorEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> कृपया पूर्ण १० अंकी ${labelName} टाका. (${val.length}/10)`;
+          } else {
+            errorEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> अवैध ${labelName}. (उदा. 98XXXXXXXX)`;
+          }
+        }
+      } else {
+        input.classList.remove("input-invalid");
+        input.classList.add("input-valid");
+        if (errorEl) errorEl.style.display = "none";
+      }
+    });
+  }
+
+  // Bind live mobile validation
+  setupMobileInputValidation("reg-mobile", "reg-mobile-error", "मोबाईल नंबर");
+  setupMobileInputValidation("reg-whatsapp", "reg-whatsapp-error", "व्हॉट्सअॅप नंबर");
+
   // Draft Download Button (Inside Form)
   if (btnDownloadDraft) {
     btnDownloadDraft.addEventListener("click", () => {
@@ -755,6 +843,42 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const submitBtn = sarpanchForm.querySelector("button[type='submit']");
       const origBtnHtml = submitBtn ? submitBtn.innerHTML : "";
+      
+      const mobileInput = document.getElementById("reg-mobile");
+      const whatsappInput = document.getElementById("reg-whatsapp");
+      const mobileVal = mobileInput ? mobileInput.value.trim() : "";
+      const whatsappVal = whatsappInput ? whatsappInput.value.trim() : "";
+
+      // Validate Mobile Number Format
+      if (!isValidIndianMobile(mobileVal)) {
+        if (mobileInput) {
+          mobileInput.classList.add("input-invalid");
+          mobileInput.focus();
+        }
+        const err = document.getElementById("reg-mobile-error");
+        if (err) {
+          err.style.display = "flex";
+          err.innerHTML = `<i class="fas fa-exclamation-circle"></i> कृपया वैध १० अंकी मोबाईल नंबर टाका (उदा. 98XXXXXXXX)`;
+        }
+        showToast("⚠️ कृपया वैध १० अंकी मोबाईल नंबर टाका!", false);
+        return;
+      }
+
+      // Validate WhatsApp Number Format
+      if (!isValidIndianMobile(whatsappVal)) {
+        if (whatsappInput) {
+          whatsappInput.classList.add("input-invalid");
+          whatsappInput.focus();
+        }
+        const err = document.getElementById("reg-whatsapp-error");
+        if (err) {
+          err.style.display = "flex";
+          err.innerHTML = `<i class="fas fa-exclamation-circle"></i> कृपया वैध १० अंकी व्हॉट्सअॅप नंबर टाका (उदा. 98XXXXXXXX)`;
+        }
+        showToast("⚠️ कृपया वैध १० अंकी व्हॉट्सअॅप नंबर टाका!", false);
+        return;
+      }
+
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>नोंदणी व फाइल्स सेव्ह होत आहेत...</span>`;
@@ -780,8 +904,8 @@ document.addEventListener("DOMContentLoaded", () => {
         regId: registrationId,
         submittedAt: timestamp,
         fullName: document.getElementById("reg-fullname")?.value.trim() || "",
-        mobile: document.getElementById("reg-mobile")?.value.trim() || "",
-        whatsapp: document.getElementById("reg-whatsapp")?.value.trim() || "",
+        mobile: mobileVal,
+        whatsapp: whatsappVal,
         email: document.getElementById("reg-email")?.value.trim() || "",
         education: document.getElementById("reg-education")?.value.trim() || "",
         village: document.getElementById("reg-village")?.value.trim() || "",
@@ -1470,6 +1594,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // CONTACT FORM CONTROLLER
   // ==========================================
   if (contactForm) {
+    const contactPhoneInput = document.getElementById("form-phone");
+    if (contactPhoneInput) {
+      contactPhoneInput.addEventListener("input", () => {
+        contactPhoneInput.value = contactPhoneInput.value.replace(/[^0-9]/g, "").slice(0, 10);
+      });
+    }
+
     contactForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const nameInput = document.getElementById("form-name");
@@ -1478,13 +1609,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const name = nameInput ? nameInput.value.trim() : "Visitor";
       const phone = phoneInput ? phoneInput.value.trim() : "";
 
-      if (!name || !phone) {
-        alert("Please fill in your name and phone number.");
+      if (!name) {
+        showToast("Please enter your name.", false);
+        if (nameInput) nameInput.focus();
+        return;
+      }
+
+      if (!phone || !isValidIndianMobile(phone)) {
+        if (phoneInput) {
+          phoneInput.classList.add("input-invalid");
+          phoneInput.focus();
+        }
+        showToast("⚠️ Please enter a valid 10-digit mobile number (e.g. 98XXXXXXXX).", false);
         return;
       }
 
       showToast(`Thank you, ${name}! Your inquiry has been sent to Gramin Bharat TV team.`);
       contactForm.reset();
+      if (phoneInput) phoneInput.classList.remove("input-invalid");
     });
   }
 });

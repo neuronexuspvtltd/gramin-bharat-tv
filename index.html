@@ -1226,11 +1226,13 @@
                   </div>
                   <div class="input-field-wrap">
                     <label>मोबाईल क्रमांक <span class="req">*</span></label>
-                    <input type="tel" id="reg-mobile" placeholder="उदा. 98XXXXXXXX" pattern="[0-9]{10}" required>
+                    <input type="tel" id="reg-mobile" placeholder="उदा. 98XXXXXXXX" maxlength="10" inputmode="numeric" required>
+                    <span class="field-error-msg" id="reg-mobile-error" style="display: none;"></span>
                   </div>
                   <div class="input-field-wrap">
                     <label>व्हॉट्सअॅप क्रमांक <span class="req">*</span></label>
-                    <input type="tel" id="reg-whatsapp" placeholder="उदा. 98XXXXXXXX" pattern="[0-9]{10}" required>
+                    <input type="tel" id="reg-whatsapp" placeholder="उदा. 98XXXXXXXX" maxlength="10" inputmode="numeric" required>
+                    <span class="field-error-msg" id="reg-whatsapp-error" style="display: none;"></span>
                   </div>
                   <div class="input-field-wrap">
                     <label>ई-मेल (असल्यास)</label>

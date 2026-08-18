@@ -400,19 +400,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // File Upload to Base64 helper for Announcement Popup
+  // File Upload to Firebase Storage / Base64 helper for Announcement Popup
   const popupFileUpload = document.getElementById("popup-file-upload");
   if (popupFileUpload) {
-    popupFileUpload.addEventListener("change", (e) => {
+    popupFileUpload.addEventListener("change", async (e) => {
       const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const base64 = event.target.result;
-          document.getElementById("popup-image-input").value = base64;
-          document.getElementById("popup-image-preview").src = base64;
-        };
-        reader.readAsDataURL(file);
+      if (!file) return;
+
+      showToast(`Uploading poster "${file.name}" from Desktop...`);
+      try {
+        let uploadedUrl = null;
+        if (window.gbtvFirebase && typeof window.gbtvFirebase.uploadFile === "function") {
+          const res = await window.gbtvFirebase.uploadFile(file, "site_uploads/posters");
+          if (res && res.url) uploadedUrl = res.url;
+        }
+
+        if (!uploadedUrl) {
+          uploadedUrl = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(file);
+          });
+        }
+
+        if (uploadedUrl) {
+          document.getElementById("popup-image-input").value = uploadedUrl;
+          document.getElementById("popup-image-preview").src = uploadedUrl;
+          showToast("✅ Poster uploaded from Desktop successfully!");
+        }
+      } catch (err) {
+        showToast("⚠️ Could not upload file: " + err.message, false);
       }
     });
   }
@@ -461,6 +479,109 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================================
+  // ADMIN DESKTOP IMAGE UPLOADER & PICKER COMPONENT
+  // =========================================================================
+  function renderAdminImagePickerField(inputId, label, currentVal = "") {
+    return `
+      <div class="admin-form-group form-group-full admin-img-picker-wrap">
+        <label class="admin-label">${label}</label>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <input type="text" id="${inputId}" class="admin-input" value="${currentVal || ''}" placeholder="Enter image URL or choose file from desktop..." oninput="updateAdminImagePickerPreview('${inputId}', this.value)" style="flex: 1; min-width: 240px;">
+          <input type="file" id="${inputId}-file" accept="image/*" style="display: none;" onchange="handleAdminDesktopImageUpload(event, '${inputId}')">
+          <button type="button" class="btn-save-changes" onclick="document.getElementById('${inputId}-file').click()" style="white-space: nowrap; height: 38px; padding: 0 14px; background: #fff7ed; color: #ea580c; border: 1.5px solid #fdba74; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 6px;">
+            <i class="fas fa-desktop"></i> <span>Upload from Desktop</span>
+          </button>
+        </div>
+        <div id="${inputId}-preview-box" style="margin-top: 8px; display: ${currentVal ? 'flex' : 'none'}; align-items: center; gap: 12px; background: #1e293b; padding: 8px 12px; border-radius: 6px; border: 1px solid #334155;">
+          <img id="${inputId}-preview-img" src="${currentVal || ''}" alt="Preview" style="max-height: 65px; max-width: 120px; border-radius: 4px; object-fit: contain; background: #0f172a; border: 1px solid #475569;">
+          <div style="font-size: 0.76rem; color: #cbd5e1; flex: 1;">
+            <span style="font-weight: 700; color: #fdba74; display: block;">Live Image Preview</span>
+            <span id="${inputId}-status-msg" style="color: #94a3b8; font-size: 0.72rem;">✓ Ready</span>
+          </div>
+          <button type="button" class="btn-tbl-action btn-tbl-delete" onclick="clearAdminImagePicker('${inputId}')" title="Clear Image" style="margin-left: auto;">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  window.updateAdminImagePickerPreview = function(inputId, url) {
+    const box = document.getElementById(`${inputId}-preview-box`);
+    const img = document.getElementById(`${inputId}-preview-img`);
+    const msg = document.getElementById(`${inputId}-status-msg`);
+    if (!box || !img) return;
+
+    if (url && url.trim() !== "") {
+      img.src = url.trim();
+      box.style.display = "flex";
+      if (msg) msg.textContent = "✓ Image link updated";
+    } else {
+      box.style.display = "none";
+      img.src = "";
+    }
+  };
+
+  window.clearAdminImagePicker = function(inputId) {
+    const input = document.getElementById(inputId);
+    const fileInput = document.getElementById(`${inputId}-file`);
+    if (input) input.value = "";
+    if (fileInput) fileInput.value = "";
+    window.updateAdminImagePickerPreview(inputId, "");
+  };
+
+  window.handleAdminDesktopImageUpload = async function(event, targetInputId) {
+    const file = event.target?.files?.[0];
+    if (!file) return;
+
+    const inputEl = document.getElementById(targetInputId);
+    const box = document.getElementById(`${targetInputId}-preview-box`);
+    const img = document.getElementById(`${targetInputId}-preview-img`);
+    const msg = document.getElementById(`${targetInputId}-status-msg`);
+
+    if (box) box.style.display = "flex";
+    if (msg) {
+      msg.innerHTML = `<i class="fas fa-spinner fa-spin" style="color: #ea580c;"></i> Uploading from desktop...`;
+    }
+
+    try {
+      let uploadedUrl = null;
+      // 1. Upload to Firebase Storage
+      if (window.gbtvFirebase && typeof window.gbtvFirebase.uploadFile === "function") {
+        const res = await window.gbtvFirebase.uploadFile(file, "site_uploads/cms_images");
+        if (res && res.url) {
+          uploadedUrl = res.url;
+        }
+      }
+
+      // 2. Base64 fallback if storage offline
+      if (!uploadedUrl) {
+        uploadedUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(file);
+        });
+      }
+
+      if (uploadedUrl) {
+        if (inputEl) inputEl.value = uploadedUrl;
+        if (img) img.src = uploadedUrl;
+        if (msg) {
+          msg.innerHTML = `<span style="color: #22c55e; font-weight: 700;">✓ Uploaded (${Math.round(file.size / 1024)} KB)</span>`;
+        }
+        showToast(`✅ Image "${file.name}" uploaded from Desktop successfully!`);
+      } else {
+        throw new Error("Could not read image file.");
+      }
+    } catch (err) {
+      console.error("Desktop upload error:", err);
+      if (msg) msg.innerHTML = `<span style="color: #ef4444;">Upload error: ${err.message}</span>`;
+      showToast("⚠️ Could not upload image: " + err.message, false);
+    }
+  };
+
+  // =========================================================================
   // 5. GENERIC DYNAMIC CRUD FORM & MODAL HANDLER
   // =========================================================================
   window.openCrudModal = function(sectionKey, itemId = null) {
@@ -492,10 +613,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <label class="admin-label">Slide Description</label>
           <textarea id="crud-hero-desc" class="admin-textarea">${item.description || ''}</textarea>
         </div>
-        <div class="admin-form-group form-group-full">
-          <label class="admin-label">Background Banner Image URL or Path</label>
-          <input type="text" id="crud-hero-bg" class="admin-input" value="${item.bgImage || ''}">
-        </div>
+        ${renderAdminImagePickerField("crud-hero-bg", "Background Banner Image (URL or Upload from Desktop)", item.bgImage)}
       `;
     } else if (sectionKey === "namdar") {
       item = itemId ? data.namdarEpisodes.find(e => e.id == itemId) : { shortTitle: "नवीन भाग", title: "गाव ते नेतृत्व – नवीन भाग", category: "Gram Panchayat", duration: "25 Min", videoId: "F8mTudf-KiY", thumbnail: "assets/hero_slide_1.jpg", points: ["विकासकामे", "सरपंच मुलाखत"] };
@@ -521,10 +639,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <label class="admin-label">Duration (e.g. 26 Min)</label>
           <input type="text" id="crud-namdar-duration" class="admin-input" value="${item.duration || '25 Min'}">
         </div>
-        <div class="admin-form-group form-group-full">
-          <label class="admin-label">Thumbnail Image URL or Path</label>
-          <input type="text" id="crud-namdar-thumb" class="admin-input" value="${item.thumbnail || ''}">
-        </div>
+        ${renderAdminImagePickerField("crud-namdar-thumb", "Thumbnail Image (URL or Upload from Desktop)", item.thumbnail)}
         <div class="admin-form-group form-group-full">
           <label class="admin-label">Episode Description</label>
           <textarea id="crud-namdar-desc" class="admin-textarea">${item.description || ''}</textarea>
@@ -562,10 +677,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <label class="admin-label">Badge Tag (e.g. 🔥 TRENDING)</label>
           <input type="text" id="crud-stream-badge" class="admin-input" value="${item.badge || '🔥 POPULAR'}">
         </div>
-        <div class="admin-form-group form-group-full">
-          <label class="admin-label">Poster Image URL or Path</label>
-          <input type="text" id="crud-stream-img" class="admin-input" value="${item.image || ''}">
-        </div>
+        ${renderAdminImagePickerField("crud-stream-img", "Poster Image (URL or Upload from Desktop)", item.image)}
       `;
     } else if (sectionKey === "showcase") {
       const list = data.showcasePosters || data.galleryImages || [];
@@ -584,10 +696,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <label class="admin-label">Category</label>
           <input type="text" id="crud-showcase-cat" class="admin-input" value="${item.category || 'Posters'}">
         </div>
-        <div class="admin-form-group form-group-full">
-          <label class="admin-label">Poster Image URL or Path</label>
-          <input type="text" id="crud-showcase-img" class="admin-input" value="${item.image || ''}">
-        </div>
+        ${renderAdminImagePickerField("crud-showcase-img", "Poster Image (URL or Upload from Desktop)", item.image)}
       `;
     } else if (sectionKey === "news") {
       item = itemId ? data.newsBlogs.find(n => n.id == itemId) : { title: "नवीन बातमी", category: "Rural News", date: "Aug 18, 2026", author: "Vilas Gadge", summary: "नवीन बातमीचा सारांश...", image: "https://graminbharat-tv.com/wp-content/uploads/2023/08/news-1.webp" };
@@ -609,10 +718,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <label class="admin-label">Author Name</label>
           <input type="text" id="crud-news-author" class="admin-input" value="${item.author || 'Vilas Gadge'}">
         </div>
-        <div class="admin-form-group">
-          <label class="admin-label">Thumbnail Image URL</label>
-          <input type="text" id="crud-news-img" class="admin-input" value="${item.image || ''}">
-        </div>
+        ${renderAdminImagePickerField("crud-news-img", "Thumbnail Image (URL or Upload from Desktop)", item.image)}
         <div class="admin-form-group form-group-full">
           <label class="admin-label">Article Summary / Excerpt</label>
           <textarea id="crud-news-summary" class="admin-textarea">${item.summary || ''}</textarea>
@@ -634,10 +740,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <label class="admin-label">Designation / Title</label>
           <input type="text" id="crud-wishes-desig" class="admin-input" value="${item.designation || ''}" required>
         </div>
-        <div class="admin-form-group form-group-full">
-          <label class="admin-label">Letter Image URL or Path</label>
-          <input type="text" id="crud-wishes-img" class="admin-input" value="${item.image || ''}">
-        </div>
+        ${renderAdminImagePickerField("crud-wishes-img", "Letter Image (URL or Upload from Desktop)", item.image)}
         <div class="admin-form-group form-group-full">
           <label class="admin-label">Quote Message / Blessing</label>
           <textarea id="crud-wishes-quote" class="admin-textarea">${item.quote || ''}</textarea>
