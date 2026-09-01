@@ -339,8 +339,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const bottomCloseBtn = document.getElementById("btn-close-form-bottom");
+
   if (namdarModalCloseBtn) {
     namdarModalCloseBtn.addEventListener("click", closeNamdarModal);
+  }
+
+  if (bottomCloseBtn) {
+    bottomCloseBtn.addEventListener("click", closeNamdarModal);
   }
 
   if (namdarModal) {
@@ -348,6 +354,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.target === namdarModal) closeNamdarModal();
     });
   }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && namdarModal && namdarModal.classList.contains("active")) {
+      closeNamdarModal();
+    }
+  });
 
   // 5-Second Interval Message Popup Tooltip
   const tooltipMessages = [

@@ -4519,6 +4519,39 @@ textarea.form-control {
   transform: translateY(-2px);
 }
 
+.btn-close-form-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 18px;
+  font-size: 0.94rem;
+  font-weight: 800;
+  border-radius: 12px;
+  background: #fef2f2;
+  border: 1.5px solid #fca5a5;
+  color: #dc2626;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-close-form-action i {
+  color: #dc2626;
+  font-size: 1.05rem;
+}
+
+.btn-close-form-action:hover {
+  background: #dc2626;
+  border-color: #b91c1c;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
+}
+
+.btn-close-form-action:hover i {
+  color: #ffffff;
+}
+
 .submit-secure-notice {
   font-size: 0.8rem;
   color: #64748b;
