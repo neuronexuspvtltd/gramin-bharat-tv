@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" width="240" height="140">
+  <defs>
+    <!-- Filter for subtle drop shadow -->
+    <filter id="logoShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="1" dy="2" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Antenna Waves above Hut -->
+  <path d="M192 18 A 20 20 0 0 1 216 18" fill="none" stroke="#007336" stroke-width="3" stroke-linecap="round"/>
+  <path d="M196 24 A 14 14 0 0 1 212 24" fill="none" stroke="#007336" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M200 30 A 8 8 0 0 1 208 30" fill="none" stroke="#007336" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Coconut Tree behind hut -->
+  <path d="M172 52 Q173 38 175 28" fill="none" stroke="#007336" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M175 28 Q165 24 162 29 M175 28 Q172 18 168 20 M175 28 Q182 19 184 24 M175 28 Q185 28 186 33 M175 28 Q174 35 170 36" fill="none" stroke="#007336" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Hut Graphic -->
+  <!-- Roof -->
+  <polygon points="204,32 178,54 230,54" fill="#007336"/>
+  <!-- Hut Walls -->
+  <rect x="186" y="54" width="36" height="26" fill="#ffffff" stroke="#007336" stroke-width="2"/>
+  <!-- Red Play Button Inside Hut -->
+  <polygon points="199,60 213,67 199,74" fill="#e10419"/>
+
+  <!-- Ground Line / Divider -->
+  <line x1="8" y1="52" x2="232" y2="52" stroke="#007336" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- 'ग्रामीण' Top Text in Saffron/Orange -->
+  <text x="8" y="47" font-family="'Noto Sans Devanagari', 'Poppins', sans-serif" font-weight="900" font-size="44" fill="#f47820" letter-spacing="1">ग्रामीण</text>
+
+  <!-- 'भारत' Middle Text in Forest Green -->
+  <text x="32" y="105" font-family="'Noto Sans Devanagari', 'Poppins', sans-serif" font-weight="900" font-size="58" fill="#007336" letter-spacing="2">भारत</text>
+
+  <!-- 'TV' Red Badge at Bottom -->
+  <g transform="translate(32, 108)">
+    <rect x="0" y="0" width="180" height="28" rx="6" fill="#e10419"/>
+    <!-- TV White Bold Text -->
+    <text x="90" y="22" font-family="'Arial Black', 'Poppins', sans-serif" font-style="italic" font-weight="900" font-size="24" fill="#ffffff" text-anchor="middle" letter-spacing="2">TV</text>
+  </g>
+</svg>
