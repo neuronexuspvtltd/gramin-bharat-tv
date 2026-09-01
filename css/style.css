@@ -4758,19 +4758,20 @@ textarea.form-control {
    ========================================================================== */
 @media (max-width: 768px) {
   .namdar-form-backdrop {
-    padding: 0;
+    padding: env(safe-area-inset-top, 10px) 0 0 0;
     align-items: flex-end;
   }
 
   .namdar-form-dialog {
     width: 100%;
     max-width: 100%;
-    max-height: 96vh;
-    height: 96vh;
+    max-height: calc(100vh - 12px);
+    height: calc(100vh - 12px);
     border-radius: 20px 20px 0 0;
     border-bottom: none;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
     transform: translateY(100%);
+    overflow: hidden;
   }
 
   .namdar-form-backdrop.active .namdar-form-dialog {
@@ -4778,38 +4779,32 @@ textarea.form-control {
   }
 
   .namdar-form-header {
-    padding: 10px 12px;
+    padding: 16px 46px 12px 14px;
     background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     border-bottom: 2px solid #fed7aa;
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
     box-shadow: 0 2px 8px rgba(234, 88, 12, 0.08);
   }
 
   .header-brand-line {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex: 1;
-    min-width: 0;
+    gap: 10px;
+    width: 100%;
   }
 
   .form-logo-img {
-    height: 36px;
+    height: 38px;
     width: auto;
-    max-width: 55px;
+    max-width: 58px;
     object-fit: contain;
     flex-shrink: 0;
-    padding: 2px 5px;
-    border-radius: 6px;
+    padding: 2px 6px;
+    border-radius: 8px;
     background: #ffffff;
     border: 1px solid #fed7aa;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   }
 
   .header-titles {
@@ -4825,7 +4820,7 @@ textarea.form-control {
     letter-spacing: 0.03em;
     display: block;
     line-height: 1.1;
-    margin-bottom: 1px;
+    margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -4859,6 +4854,9 @@ textarea.form-control {
   }
 
   .form-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 12px;
     width: 32px;
     height: 32px;
     font-size: 0.95rem;
@@ -4870,19 +4868,20 @@ textarea.form-control {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
     cursor: pointer;
+    z-index: 10;
   }
 
-  @media (max-width: 400px) {
+  @media (max-width: 380px) {
     .namdar-form-header {
-      padding: 8px 10px;
-      gap: 6px;
+      padding: 14px 40px 10px 10px;
     }
     .header-brand-line {
       gap: 6px;
     }
     .form-logo-img {
-      height: 30px;
+      height: 32px;
       max-width: 48px;
       padding: 1px 4px;
     }
@@ -4899,6 +4898,8 @@ textarea.form-control {
     .form-close-btn {
       width: 28px;
       height: 28px;
+      top: 12px;
+      right: 8px;
       font-size: 0.85rem;
     }
   }
