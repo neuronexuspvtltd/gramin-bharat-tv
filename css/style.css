@@ -4791,20 +4791,23 @@ textarea.form-control {
    ========================================================================== */
 @media (max-width: 768px) {
   .namdar-form-backdrop {
-    padding: env(safe-area-inset-top, 10px) 0 0 0;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 65px);
     align-items: flex-end;
   }
 
   .namdar-form-dialog {
     width: 100%;
     max-width: 100%;
-    max-height: calc(100vh - 12px);
-    height: calc(100vh - 12px);
+    max-height: calc(100vh - 65px);
+    max-height: calc(100dvh - 65px);
+    height: calc(100vh - 65px);
+    height: calc(100dvh - 65px);
     border-radius: 20px 20px 0 0;
     border-bottom: none;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
     transform: translateY(100%);
     overflow: hidden;
+    margin-top: auto;
   }
 
   .namdar-form-backdrop.active .namdar-form-dialog {
@@ -4812,12 +4815,22 @@ textarea.form-control {
   }
 
   .namdar-form-header {
-    padding: 16px 46px 12px 14px;
+    padding: 12px 46px 12px 14px;
     background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     border-bottom: 2px solid #fed7aa;
     position: relative;
     z-index: 100;
     box-shadow: 0 2px 8px rgba(234, 88, 12, 0.08);
+  }
+
+  .namdar-form-header::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: #fdba74;
+    border-radius: 999px;
+    margin: 0 auto 10px auto;
   }
 
   .header-brand-line {
