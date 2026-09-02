@@ -103,15 +103,21 @@
           <div class="top-location-info">
             <div class="top-location-item">
               <i class="fas fa-map-marker-alt"></i>
-              <span><strong>Nagpur:</strong> Bhagwan Nagar, Nagpur - 440027</span>
+              <span><strong data-i18n="nagpur_office">Nagpur Head Office:</strong> Bhagwan Nagar, Nagpur - 440027</span>
             </div>
             <div class="top-location-item" style="border-left: 1px solid rgba(0,0,0,0.1); padding-left: 14px;">
               <i class="fas fa-building"></i>
-              <span><strong>Mumbai:</strong> Heera Panna Mall, Oshiwara, Andheri West - 400102</span>
+              <span><strong data-i18n="mumbai_office">Mumbai Office:</strong> Heera Panna Mall, Oshiwara, Andheri West - 400102</span>
             </div>
           </div>
           <div class="top-social-actions">
-            <span>Follow Us:</span>
+            <!-- Language Switcher Pill -->
+            <div class="lang-switch-pill">
+              <button class="lang-switch-btn active" data-lang="mr">मराठी</button>
+              <span class="lang-sep">|</span>
+              <button class="lang-switch-btn" data-lang="en">English</button>
+            </div>
+            <span style="margin-left: 8px;" data-i18n="follow_us">Follow Us:</span>
             <a href="https://facebook.com" target="_blank" class="social-link-item" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
             <a href="https://twitter.com" target="_blank" class="social-link-item" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
             <a href="https://instagram.com" target="_blank" class="social-link-item" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
@@ -132,17 +138,23 @@
 
           <!-- Navigation Links -->
           <ul class="nav-menu-list">
-            <li><a href="#home" class="nav-link-btn active" data-nav-target="home">Home</a></li>
-            <li><a href="#about" class="nav-link-btn" data-nav-target="about">About Us</a></li>
-            <li><a href="#works" class="nav-link-btn" data-nav-target="works">Our Works</a></li>
-            <li><a href="#good-wishes" class="nav-link-btn" data-nav-target="good-wishes">Good Wishes</a></li>
-            <li><a href="#gallery" class="nav-link-btn" data-nav-target="gallery">Gallery</a></li>
-            <li><a href="#blog" class="nav-link-btn" data-nav-target="blog">Blog & News</a></li>
-            <li><a href="#contact" class="nav-link-btn" data-nav-target="contact">Contact Us</a></li>
+            <li><a href="#home" class="nav-link-btn active" data-nav-target="home" data-i18n="nav_home">Home</a></li>
+            <li><a href="#about" class="nav-link-btn" data-nav-target="about" data-i18n="nav_about">About Us</a></li>
+            <li><a href="#works" class="nav-link-btn" data-nav-target="works" data-i18n="nav_works">Our Works</a></li>
+            <li><a href="#good-wishes" class="nav-link-btn" data-nav-target="good-wishes" data-i18n="nav_wishes">Good Wishes</a></li>
+            <li><a href="#gallery" class="nav-link-btn" data-nav-target="gallery" data-i18n="nav_gallery">Gallery</a></li>
+            <li><a href="#blog" class="nav-link-btn" data-nav-target="blog" data-i18n="nav_blog">Blog & News</a></li>
+            <li><a href="#contact" class="nav-link-btn" data-nav-target="contact" data-i18n="nav_contact">Contact Us</a></li>
           </ul>
 
           <!-- Header Right Actions -->
           <div class="header-actions">
+            <!-- Language Switcher Badge -->
+            <div class="lang-toggle-badge" id="lang-toggle-btn" role="button" title="भाषा बदला / Change Language">
+              <i class="fas fa-globe"></i>
+              <span class="lang-text" id="active-lang-label">मराठी</span>
+            </div>
+
             <button class="btn-search-trigger" data-search-trigger aria-label="Search">
               <i class="fas fa-search"></i>
             </button>
@@ -151,7 +163,7 @@
                 <i class="fas fa-phone-alt"></i>
               </div>
               <div class="call-info">
-                <span class="call-label">Call Us Now</span>
+                <span class="call-label" data-i18n="call_us_now">Call Us Now</span>
                 <span class="call-number">+91 99872 13141</span>
               </div>
             </a>
@@ -1167,14 +1179,23 @@
         </button>
       </div>
 
+      <!-- Mobile Language Bar -->
+      <div class="mobile-lang-bar">
+        <span class="mobile-lang-title"><i class="fas fa-globe"></i> भाषा निवडा / Language:</span>
+        <div class="mobile-lang-options">
+          <button class="btn-lang-option active" data-lang="mr">मराठी (MR)</button>
+          <button class="btn-lang-option" data-lang="en">English (EN)</button>
+        </div>
+      </div>
+
       <nav class="drawer-nav-list">
-        <a href="#home" class="drawer-nav-link active" data-nav-target="home"><i class="fas fa-home"></i> Home</a>
-        <a href="#about" class="drawer-nav-link" data-nav-target="about"><i class="fas fa-user"></i> About Us</a>
-        <a href="#works" class="drawer-nav-link" data-nav-target="works"><i class="fas fa-seedling"></i> Our Works</a>
-        <a href="#good-wishes" class="drawer-nav-link" data-nav-target="good-wishes"><i class="fas fa-heart"></i> Good Wishes</a>
-        <a href="#gallery" class="drawer-nav-link" data-nav-target="gallery"><i class="fas fa-images"></i> Gallery</a>
-        <a href="#blog" class="drawer-nav-link" data-nav-target="blog"><i class="fas fa-newspaper"></i> Blog & News</a>
-        <a href="#contact" class="drawer-nav-link" data-nav-target="contact"><i class="fas fa-envelope"></i> Contact Us</a>
+        <a href="#home" class="drawer-nav-link active" data-nav-target="home"><i class="fas fa-home"></i> <span data-i18n="nav_home">Home</span></a>
+        <a href="#about" class="drawer-nav-link" data-nav-target="about"><i class="fas fa-user"></i> <span data-i18n="nav_about">About Us</span></a>
+        <a href="#works" class="drawer-nav-link" data-nav-target="works"><i class="fas fa-seedling"></i> <span data-i18n="nav_works">Our Works</span></a>
+        <a href="#good-wishes" class="drawer-nav-link" data-nav-target="good-wishes"><i class="fas fa-heart"></i> <span data-i18n="nav_wishes">Good Wishes</span></a>
+        <a href="#gallery" class="drawer-nav-link" data-nav-target="gallery"><i class="fas fa-images"></i> <span data-i18n="nav_gallery">Gallery</span></a>
+        <a href="#blog" class="drawer-nav-link" data-nav-target="blog"><i class="fas fa-newspaper"></i> <span data-i18n="nav_blog">Blog & News</span></a>
+        <a href="#contact" class="drawer-nav-link" data-nav-target="contact"><i class="fas fa-envelope"></i> <span data-i18n="nav_contact">Contact Us</span></a>
       </nav>
     </div>
 
@@ -1548,6 +1569,7 @@
 
   <!-- Application Scripts -->
   <script src="js/data.js"></script>
+  <script src="js/translations.js"></script>
   <script src="js/slider.js"></script>
   <script src="js/app.js"></script>
 </body>

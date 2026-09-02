@@ -1641,4 +1641,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (phoneInput) phoneInput.classList.remove("input-invalid");
     });
   }
+
+  // ==========================================
+  // LANGUAGE SWITCHER SYNC CONTROLLER
+  // ==========================================
+  window.addEventListener("languageChanged", () => {
+    if (window.gbtvLang) {
+      window.gbtvLang.applyTranslations();
+    }
+  });
 });
