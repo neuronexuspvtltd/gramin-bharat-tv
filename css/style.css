@@ -4677,7 +4677,8 @@ textarea.form-control {
 /* ==========================================================================
    SUCCESS & DOWNLOAD RECEIPT MODAL
    ========================================================================== */
-.namdar-success-backdrop {
+.namdar-success-backdrop,
+.payment-success-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.75);
@@ -4690,17 +4691,23 @@ textarea.form-control {
   padding: 20px;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.namdar-success-backdrop.active {
+.namdar-success-backdrop.active,
+.namdar-success-backdrop.open,
+.payment-success-backdrop.active,
+.payment-success-backdrop.open {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
-.namdar-success-dialog {
+.namdar-success-dialog,
+.payment-success-dialog {
   width: 100%;
-  max-width: 500px;
+  max-width: 520px;
   background: #ffffff;
   border: 2px solid #fed7aa;
   border-radius: 24px;
@@ -4709,9 +4716,14 @@ textarea.form-control {
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
   transform: scale(0.92) translateY(15px);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-.namdar-success-backdrop.active .namdar-success-dialog {
+.namdar-success-backdrop.active .namdar-success-dialog,
+.namdar-success-backdrop.open .namdar-success-dialog,
+.payment-success-backdrop.active .payment-success-dialog,
+.payment-success-backdrop.open .payment-success-dialog {
   transform: scale(1) translateY(0);
 }
 
@@ -4852,22 +4864,59 @@ textarea.form-control {
 
 .btn-submit-registration {
   width: 100%;
-  padding: 13px;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #ff8c00 0%, #e10419 100%);
+  padding: 16px 20px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #ff7a00 0%, #e60000 100%);
   border: none;
   color: #ffffff;
   font-weight: 800;
-  font-size: 0.95rem;
-  letter-spacing: 0.02em;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(225, 4, 25, 0.35);
+  box-shadow: 0 10px 28px rgba(230, 0, 0, 0.45);
   transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-decoration: none;
 }
 
 .btn-submit-registration:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(225, 4, 25, 0.5);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 14px 35px rgba(230, 0, 0, 0.6);
+  background: linear-gradient(135deg, #ff8800 0%, #ff0000 100%);
+}
+
+.btn-submit-registration:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.btn-submit-registration .btn-lock-icon {
+  font-size: 1.6rem;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.btn-submit-registration .btn-text-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.25;
+}
+
+.btn-submit-registration .btn-main-text {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+}
+
+.btn-submit-registration .btn-sub-text {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-top: 3px;
+  letter-spacing: 0.02em;
 }
 
 .btn-submit-whatsapp-direct {

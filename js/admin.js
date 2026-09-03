@@ -1608,6 +1608,80 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // =========================================================================
+  // RAZORPAY PAYMENT GATEWAY CONTROLLER
+  // =========================================================================
+  const rzpForm = document.getElementById("razorpay-settings-form");
+  const rzpStatusIndicator = document.getElementById("razorpay-status-indicator");
+  const rzpStatusText = document.getElementById("razorpay-status-text");
+  const rzpKeyId = document.getElementById("rzp-cfg-key-id");
+  const rzpKeySecret = document.getElementById("rzp-cfg-key-secret");
+  const rzpAmount = document.getElementById("rzp-cfg-amount");
+  const rzpCurrency = document.getElementById("rzp-cfg-currency");
+  const rzpEnabled = document.getElementById("rzp-cfg-enabled");
+  const btnResetRzp = document.getElementById("btn-reset-razorpay-cfg");
+
+  function updateRazorpayStatusUI() {
+    if (!window.getRazorpayConfig) return;
+    const cfg = window.getRazorpayConfig();
+
+    if (rzpKeyId && cfg.keyId) rzpKeyId.value = cfg.keyId;
+    if (rzpKeySecret && cfg.keySecret) rzpKeySecret.value = cfg.keySecret;
+    if (rzpAmount && cfg.amount) rzpAmount.value = cfg.amount;
+    if (rzpCurrency && cfg.currency) rzpCurrency.value = cfg.currency;
+    if (rzpEnabled) rzpEnabled.checked = cfg.enabled !== false;
+
+    if (rzpStatusIndicator && rzpStatusText) {
+      if (!cfg.enabled) {
+        rzpStatusIndicator.style.background = "#fef2f2";
+        rzpStatusIndicator.style.color = "#b91c1c";
+        rzpStatusIndicator.style.borderColor = "#fca5a5";
+        rzpStatusText.innerHTML = "🔴 Online Payment Disabled";
+      } else if (cfg.keyId && !cfg.keyId.includes("YOUR_") && !cfg.keyId.includes("PLACEHOLDER")) {
+        const isLive = cfg.keyId.startsWith("rzp_live_");
+        rzpStatusIndicator.style.background = "#dcfce7";
+        rzpStatusIndicator.style.color = "#15803d";
+        rzpStatusIndicator.style.borderColor = "#86efac";
+        rzpStatusText.innerHTML = isLive ? "🟢 Razorpay LIVE Gateway Active" : "🟡 Razorpay TEST Gateway Active";
+      } else {
+        rzpStatusIndicator.style.background = "#fff7ed";
+        rzpStatusIndicator.style.color = "#c2410c";
+        rzpStatusIndicator.style.borderColor = "#fdba74";
+        rzpStatusText.innerHTML = "⚡ Dev Simulation Mode (Placeholder Key)";
+      }
+    }
+  }
+
+  updateRazorpayStatusUI();
+
+  if (rzpForm) {
+    rzpForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const newConfig = {
+        keyId: rzpKeyId?.value.trim() || "",
+        keySecret: rzpKeySecret?.value.trim() || "",
+        amount: parseInt(rzpAmount?.value || "1100", 10),
+        currency: rzpCurrency?.value.trim() || "INR",
+        enabled: rzpEnabled ? rzpEnabled.checked : true
+      };
+
+      if (window.saveRazorpayConfig) {
+        window.saveRazorpayConfig(newConfig);
+      }
+      updateRazorpayStatusUI();
+      showToast("✓ Razorpay Payment Gateway Settings saved successfully!");
+    });
+  }
+
+  if (btnResetRzp) {
+    btnResetRzp.addEventListener("click", () => {
+      if (confirm("Reset Razorpay settings to defaults?")) {
+        localStorage.removeItem("GBTV_RAZORPAY_CONFIG_STORE");
+        updateRazorpayStatusUI();
+        showToast("Razorpay configuration reset to default.");
+      }
+    });
+  }
   // Setup real-time listener for registrations
   if (window.gbtvFirebase && typeof window.gbtvFirebase.listenRegistrations === "function") {
     window.gbtvFirebase.listenRegistrations((registrations, isCloud) => {

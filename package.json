@@ -1,0 +1,20 @@
+{
+  "name": "gramin-bharat-tv",
+  "version": "1.0.0",
+  "description": "Gramin Bharat TV - Official Web Application & Admin Portal",
+  "main": "server.js",
+  "scripts": {
+    "build": "node build.js",
+    "start": "node server.js",
+    "dev": "node server.js",
+    "preview": "node build.js && node server.js dist"
+  },
+  "keywords": [
+    "gramin-bharat-tv",
+    "sarpanch-sanman",
+    "razorpay",
+    "firebase"
+  ],
+  "author": "Neuronexus Pvt Ltd",
+  "license": "MIT"
+}

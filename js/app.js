@@ -320,6 +320,55 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Payment Success Modal Elements & Handlers
+  const paymentSuccessModal = document.getElementById("payment-success-modal");
+  const btnClosePaymentSuccess = document.getElementById("btn-close-payment-success");
+  const btnDownloadPaidReceipt = document.getElementById("btn-download-paid-receipt");
+
+  function openPaymentSuccessModal(regData, paymentInfo) {
+    if (!paymentSuccessModal) return;
+
+    const successRegId = document.getElementById("success-reg-id");
+    const successApplicantName = document.getElementById("success-applicant-name");
+    const successVillageInfo = document.getElementById("success-village-info");
+    const successAmountPaid = document.getElementById("success-amount-paid");
+    const successPaymentId = document.getElementById("success-payment-id");
+    const successTimestamp = document.getElementById("success-timestamp");
+
+    if (successRegId) successRegId.textContent = regData.regId || "GBTV-SARPANCH-2026-XXXX";
+    if (successApplicantName) successApplicantName.textContent = regData.fullName || "-";
+    if (successVillageInfo) successVillageInfo.textContent = `${regData.village || "-"}, तालु: ${regData.taluka || "-"}, जि: ${regData.district || "-"}`;
+    if (successAmountPaid) successAmountPaid.textContent = `₹${paymentInfo?.amount_paid || 1100}`;
+    if (successPaymentId) successPaymentId.textContent = paymentInfo?.razorpay_payment_id || "pay_xxxxxxxxx";
+    if (successTimestamp) successTimestamp.textContent = regData.submittedAt || new Date().toLocaleString("en-IN");
+
+    paymentSuccessModal.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closePaymentSuccessModal() {
+    if (paymentSuccessModal) {
+      paymentSuccessModal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  }
+
+  if (btnClosePaymentSuccess) {
+    btnClosePaymentSuccess.addEventListener("click", closePaymentSuccessModal);
+  }
+
+  if (btnDownloadPaidReceipt) {
+    btnDownloadPaidReceipt.addEventListener("click", () => {
+      printOrDownloadApplicationForm(lastSubmittedRegData);
+    });
+  }
+
+  if (paymentSuccessModal) {
+    paymentSuccessModal.addEventListener("click", (e) => {
+      if (e.target === paymentSuccessModal) closePaymentSuccessModal();
+    });
+  }
+
   if (floatingRegBtn) {
     floatingRegBtn.addEventListener("click", openNamdarModal);
   }
@@ -949,36 +998,84 @@ document.addEventListener("DOMContentLoaded", () => {
         certificates: certEl?.files?.[0] || null
       };
 
-      let savedRecord = registrationData;
-      if (window.gbtvFirebase && typeof window.gbtvFirebase.saveRegistration === "function") {
-        savedRecord = await window.gbtvFirebase.saveRegistration(registrationData, fileMap);
-      } else {
-        try {
-          const stored = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
-          stored.unshift(registrationData);
-          localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(stored));
-        } catch (err) {
-          console.error("Storage error:", err);
+      const rzpConfig = window.getRazorpayConfig ? window.getRazorpayConfig() : null;
+      const isRzpEnabled = !rzpConfig || rzpConfig.enabled !== false;
+
+      async function saveAndFinishRegistration(paymentInfo = null) {
+        if (paymentInfo) {
+          registrationData.payment = paymentInfo;
+          registrationData.paymentStatus = "PAID";
+          registrationData.paymentId = paymentInfo.razorpay_payment_id;
+          registrationData.amountPaid = paymentInfo.amount_paid;
         }
+
+        let savedRecord = registrationData;
+        if (window.gbtvFirebase && typeof window.gbtvFirebase.saveRegistration === "function") {
+          savedRecord = await window.gbtvFirebase.saveRegistration(registrationData, fileMap);
+        } else {
+          try {
+            const stored = JSON.parse(localStorage.getItem("GBTV_SARPANCH_REGISTRATIONS") || "[]");
+            stored.unshift(registrationData);
+            localStorage.setItem("GBTV_SARPANCH_REGISTRATIONS", JSON.stringify(stored));
+          } catch (err) {
+            console.error("Storage error:", err);
+          }
+        }
+
+        lastSubmittedRegData = savedRecord || registrationData;
+
+        // Close registration form modal
+        closeNamdarModal();
+
+        sarpanchForm.reset();
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = origBtnHtml;
+        }
+        fileUploadInputs.forEach(item => {
+          const statusEl = document.getElementById(item.statusId);
+          const box = document.getElementById(item.inputId)?.closest(".doc-upload-box");
+          if (statusEl) statusEl.textContent = "कोणतीही फाइल निवडलेली नाही";
+          if (box) box.classList.remove("has-file");
+        });
+
+        if (paymentInfo) {
+          openPaymentSuccessModal(lastSubmittedRegData, paymentInfo);
+          showToast(`🎉 नोंदणी व ₹${paymentInfo.amount_paid} पेमेंट यशस्वी! પાવતી डाऊनलोड होत आहे...`);
+        } else {
+          showToast(`✅ नोंदणी यशस्वी झाली! अर्ज डाउनलोड होत आहे... (नोंदणी क्र: ${registrationId})`);
+        }
+
+        // Auto-trigger Download / Print of the submitted application PDF immediately
+        setTimeout(() => {
+          printOrDownloadApplicationForm(lastSubmittedRegData);
+        }, 400);
       }
 
-      lastSubmittedRegData = savedRecord || registrationData;
-
-      // Close registration form modal
-      closeNamdarModal();
-
-      // Show confirmation toast with Registration ID
-      showToast(`✅ नोंदणी यशस्वी झाली! अर्ज डाउनलोड होत आहे... (नोंदणी क्र: ${registrationId})`);
-      
-      // Auto-trigger Download / Print of the submitted application PDF immediately
-      setTimeout(() => {
-        printOrDownloadApplicationForm(lastSubmittedRegData);
-      }, 350);
-
-      sarpanchForm.reset();
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = origBtnHtml;
+      if (isRzpEnabled && typeof window.launchRazorpayCheckout === "function") {
+        if (submitBtn) submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>पेमेंट गेटवे सुरू होत आहे...</span>`;
+        window.launchRazorpayCheckout(
+          registrationData,
+          function onSuccess(paymentInfo) {
+            saveAndFinishRegistration(paymentInfo);
+          },
+          function onDismiss(reason) {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = origBtnHtml;
+            }
+            showToast("⚠️ ऑनलाइन पेमेंट पूर्ण झाले नाही. नोंदणी रद्द केली.", false);
+          },
+          function onError(err) {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = origBtnHtml;
+            }
+            showToast("⚠️ पेमेंट प्रक्रिया त्रुटी: " + (err.message || err), false);
+          }
+        );
+      } else {
+        await saveAndFinishRegistration(null);
       }
       fileUploadInputs.forEach(item => {
         const statusEl = document.getElementById(item.statusId);
@@ -1017,51 +1114,63 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================
   // RENDER HERO SLIDER
   // ==========================================
-  const heroSliderWrapper = document.getElementById("hero-slider-wrapper");
-  if (heroSliderWrapper && data.heroSlides) {
-    heroSliderWrapper.innerHTML = data.heroSlides.map((slide, idx) => `
-      <div class="hero-slide-item ${idx === 0 ? "active-slide" : ""}">
-        <div class="container">
-          <div class="hero-split-container">
-            <!-- Left Half: Content -->
-            <div class="hero-left-half">
-              <!-- 4 Vertical Glow Bars -->
-              <div class="hero-vertical-accent">
-                <span class="accent-bar"></span>
-                <span class="accent-bar"></span>
-                <span class="accent-bar"></span>
-                <span class="accent-bar"></span>
+  let currentHeroIndex = 0;
+  let heroTimer = null;
+
+  function renderHeroSlider() {
+    const heroSliderWrapper = document.getElementById("hero-slider-wrapper");
+    if (!heroSliderWrapper || !data.heroSlides) return;
+
+    heroSliderWrapper.innerHTML = data.heroSlides.map((slide, idx) => {
+      const tag = window.gbtvLang ? window.gbtvLang.t(`hero_tag_${slide.id}`) : slide.tag;
+      const title = window.gbtvLang ? window.gbtvLang.t(`hero_title_${slide.id}`) : slide.title;
+      const description = window.gbtvLang ? window.gbtvLang.t(`hero_desc_${slide.id}`) : slide.description;
+      const ctaText = window.gbtvLang ? window.gbtvLang.t(`hero_cta_${slide.id}`) : slide.ctaText;
+      const videoTitle = window.gbtvLang ? window.gbtvLang.t(`hero_video_${slide.id}`) : slide.videoTitle;
+
+      return `
+        <div class="hero-slide-item ${idx === currentHeroIndex ? "active-slide" : ""}">
+          <div class="container">
+            <div class="hero-split-container">
+              <!-- Left Half: Content -->
+              <div class="hero-left-half">
+                <div class="hero-vertical-accent">
+                  <span class="accent-bar"></span>
+                  <span class="accent-bar"></span>
+                  <span class="accent-bar"></span>
+                  <span class="accent-bar"></span>
+                </div>
+
+                <div class="hero-content-inner">
+                  <div class="hero-top-tag">
+                    <i class="fas fa-angle-double-right"></i> ${tag}
+                  </div>
+                  <h1 class="hero-split-title">${title}</h1>
+                  <p class="hero-split-desc">${description}</p>
+                  <div class="hero-actions-row">
+                    <button class="btn-hero-primary" data-nav-target="${slide.ctaPage}">
+                      ${ctaText} <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="btn-hero-watch" data-video-id="${slide.videoId}" data-video-title="${videoTitle}">
+                      <span class="hero-play-icon"><i class="fas fa-play"></i></span>
+                      <span>${videoTitle}</span>
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              <div class="hero-content-inner">
-                <div class="hero-top-tag">
-                  <i class="fas fa-angle-double-right"></i> ${slide.tag}
+              <!-- Right Half: Image with Floating Animation -->
+              <div class="hero-right-half">
+                <div class="hero-image-wrapper" data-video-id="${slide.videoId}" data-video-title="${videoTitle}">
+                  <img src="${slide.bgImage}" alt="Gramin Bharat TV - Vilas Gadge" class="hero-main-photo" loading="lazy">
+                  <div class="hero-orange-corner"></div>
                 </div>
-                <h1 class="hero-split-title">${slide.title}</h1>
-                <p class="hero-split-desc">${slide.description}</p>
-                <div class="hero-actions-row">
-                  <button class="btn-hero-primary" data-nav-target="${slide.ctaPage}">
-                    ${slide.ctaText} <i class="fas fa-arrow-right"></i>
-                  </button>
-                  <button class="btn-hero-watch" data-video-id="${slide.videoId}" data-video-title="${slide.videoTitle}">
-                    <span class="hero-play-icon"><i class="fas fa-play"></i></span>
-                    <span>${slide.videoTitle}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Half: Image with Floating Animation -->
-            <div class="hero-right-half">
-              <div class="hero-image-wrapper" data-video-id="${slide.videoId}" data-video-title="${slide.videoTitle}">
-                <img src="${slide.bgImage}" alt="Gramin Bharat TV - Vilas Gadge" class="hero-main-photo" loading="lazy">
-                <div class="hero-orange-corner"></div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
 
     // Rebind CTA buttons in hero slides to navigateTo
     heroSliderWrapper.querySelectorAll("[data-nav-target]").forEach(btn => {
@@ -1072,7 +1181,14 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    let currentHeroIndex = 0;
+    heroSliderWrapper.querySelectorAll("[data-video-id]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const vId = btn.getAttribute("data-video-id");
+        const vTitle = btn.getAttribute("data-video-title");
+        if (vId) openVideoModal(vId, vTitle);
+      });
+    });
+
     const heroSlides = Array.from(heroSliderWrapper.children);
     const heroDotsContainer = document.getElementById("hero-dots-container");
     const heroPrevBtn = document.getElementById("hero-prev-btn");
@@ -1081,7 +1197,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderHeroDots() {
       if (!heroDotsContainer) return;
       heroDotsContainer.innerHTML = heroSlides.map((_, i) => `
-        <button class="slider-dot ${i === 0 ? "active" : ""}" aria-label="Hero Slide ${i + 1}" data-hero-dot="${i}"></button>
+        <button class="slider-dot ${i === currentHeroIndex ? "active" : ""}" aria-label="Hero Slide ${i + 1}" data-hero-dot="${i}"></button>
       `).join("");
 
       heroDotsContainer.querySelectorAll("[data-hero-dot]").forEach(dot => {
@@ -1105,13 +1221,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderHeroDots();
 
-    if (heroPrevBtn) heroPrevBtn.addEventListener("click", () => goToHeroSlide(currentHeroIndex - 1));
-    if (heroNextBtn) heroNextBtn.addEventListener("click", () => goToHeroSlide(currentHeroIndex + 1));
+    if (heroPrevBtn && !heroPrevBtn.hasAttribute("data-bound")) {
+      heroPrevBtn.setAttribute("data-bound", "true");
+      heroPrevBtn.addEventListener("click", () => goToHeroSlide(currentHeroIndex - 1));
+    }
+    if (heroNextBtn && !heroNextBtn.hasAttribute("data-bound")) {
+      heroNextBtn.setAttribute("data-bound", "true");
+      heroNextBtn.addEventListener("click", () => goToHeroSlide(currentHeroIndex + 1));
+    }
 
-    setInterval(() => {
-      goToHeroSlide(currentHeroIndex + 1);
-    }, 7000);
+    if (!heroTimer) {
+      heroTimer = setInterval(() => {
+        goToHeroSlide(currentHeroIndex + 1);
+      }, 7000);
+    }
   }
+
+  renderHeroSlider();
 
   // ==========================================
   // STATS COUNTERS ANIMATION (DUAL STRIP & CARDS)
@@ -1407,22 +1533,32 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================
   // RENDER TESTIMONIALS
   // ==========================================
-  const testimonialContainer = document.getElementById("testimonial-wrapper");
-  if (testimonialContainer && data.testimonials) {
-    testimonialContainer.innerHTML = data.testimonials.map(item => `
-      <div class="testimonial-card-item">
-        <div class="testimonial-avatar-wrap">
-          <img src="${item.avatar}" alt="${item.name}" loading="lazy">
+  function renderTestimonials() {
+    const testimonialContainer = document.getElementById("testimonial-wrapper");
+    if (!testimonialContainer || !data.testimonials) return;
+
+    testimonialContainer.innerHTML = data.testimonials.map(item => {
+      const comment = window.gbtvLang ? window.gbtvLang.t(`testi_${item.id}_comment`) : item.comment;
+      const name = window.gbtvLang ? window.gbtvLang.t(`testi_${item.id}_name`) : item.name;
+      const role = window.gbtvLang ? window.gbtvLang.t(`testi_${item.id}_role`) : item.role;
+
+      return `
+        <div class="testimonial-card-item">
+          <div class="testimonial-avatar-wrap">
+            <img src="${item.avatar}" alt="${name}" loading="lazy">
+          </div>
+          <div class="testimonial-body">
+            <div class="testimonial-quote-icon"><i class="fas fa-quote-left"></i></div>
+            <p class="testimonial-comment">"${comment}"</p>
+            <div class="testimonial-author-name">${name}</div>
+            <div class="testimonial-author-role">${role}</div>
+          </div>
         </div>
-        <div class="testimonial-body">
-          <div class="testimonial-quote-icon"><i class="fas fa-quote-left"></i></div>
-          <p class="testimonial-comment">"${item.comment}"</p>
-          <div class="testimonial-author-name">${item.name}</div>
-          <div class="testimonial-author-role">${item.role}</div>
-        </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
   }
+
+  renderTestimonials();
 
   // ==========================================
   // RENDER BLOG & NEWS
@@ -1649,5 +1785,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.gbtvLang) {
       window.gbtvLang.applyTranslations();
     }
+    renderHeroSlider();
+    renderTestimonials();
   });
 });
