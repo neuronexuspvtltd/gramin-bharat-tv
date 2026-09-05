@@ -140,7 +140,21 @@
           <ul class="nav-menu-list">
             <li><a href="#home" class="nav-link-btn active" data-nav-target="home" data-i18n="nav_home">Home</a></li>
             <li><a href="#about" class="nav-link-btn" data-nav-target="about" data-i18n="nav_about">About Us</a></li>
-            <li><a href="#works" class="nav-link-btn" data-nav-target="works" data-i18n="nav_works">Our Works</a></li>
+            <li class="nav-dropdown">
+              <a href="#works" class="nav-link-btn" data-nav-target="works">
+                <span data-i18n="nav_works">Our Works</span> <i class="fas fa-chevron-down nav-dropdown-arrow"></i>
+              </a>
+              <div class="dropdown-menu">
+                <a href="#works" class="dropdown-link" data-nav-target="works">
+                  <i class="fas fa-bullhorn dropdown-icon-orange"></i>
+                  <span data-i18n="nav_janjagruti">Mission Janjagruti</span>
+                </a>
+                <a href="#mulakhati" class="dropdown-link" data-nav-target="mulakhati">
+                  <i class="fas fa-microphone-alt dropdown-icon-red"></i>
+                  <span data-i18n="nav_mulakhati">Sarpanch Mulakhati</span>
+                </a>
+              </div>
+            </li>
             <li><a href="#good-wishes" class="nav-link-btn" data-nav-target="good-wishes" data-i18n="nav_wishes">Good Wishes</a></li>
             <li><a href="#gallery" class="nav-link-btn" data-nav-target="gallery" data-i18n="nav_gallery">Gallery</a></li>
             <li><a href="#blog" class="nav-link-btn" data-nav-target="blog" data-i18n="nav_blog">Blog & News</a></li>
@@ -532,6 +546,27 @@
       <div class="container" style="padding: 60px 24px;">
         <div id="works-video-grid" class="video-archive-grid">
           <!-- Dynamic works video grid populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         3B. SARPANCH MULAKHATI VIEW
+         ======================================================================= -->
+    <section id="view-mulakhati" class="page-view">
+      <div class="page-hero-banner">
+        <div class="container">
+          <div class="banner-subtitle"><i class="fas fa-microphone-alt" style="color: #e10419;"></i> <span data-i18n="mulakhati_page_subtitle">INTERVIEW SERIES</span></div>
+          <h1 class="banner-title" data-i18n-html="mulakhati_page_title">Sarpanch <span class="gradient-text">Mulakhati</span></h1>
+          <p style="font-size: 1.1rem; color: var(--text-muted); max-width: 700px; margin: 14px auto 0;" data-i18n="mulakhati_page_tagline">
+            Exclusive interviews and success stories of visionary Sarpanchs across Maharashtra.
+          </p>
+        </div>
+      </div>
+
+      <div class="container" style="padding: 60px 24px;">
+        <div id="mulakhati-video-grid" class="video-archive-grid">
+          <!-- Dynamic Sarpanch Mulakhati video grid populated by JS -->
         </div>
       </div>
     </section>
@@ -1191,7 +1226,8 @@
       <nav class="drawer-nav-list">
         <a href="#home" class="drawer-nav-link active" data-nav-target="home"><i class="fas fa-home"></i> <span data-i18n="nav_home">Home</span></a>
         <a href="#about" class="drawer-nav-link" data-nav-target="about"><i class="fas fa-user"></i> <span data-i18n="nav_about">About Us</span></a>
-        <a href="#works" class="drawer-nav-link" data-nav-target="works"><i class="fas fa-seedling"></i> <span data-i18n="nav_works">Our Works</span></a>
+        <a href="#works" class="drawer-nav-link" data-nav-target="works"><i class="fas fa-bullhorn"></i> <span data-i18n="nav_janjagruti">Mission Janjagruti</span></a>
+        <a href="#mulakhati" class="drawer-nav-link" data-nav-target="mulakhati"><i class="fas fa-microphone-alt"></i> <span data-i18n="nav_mulakhati">Sarpanch Mulakhati</span></a>
         <a href="#good-wishes" class="drawer-nav-link" data-nav-target="good-wishes"><i class="fas fa-heart"></i> <span data-i18n="nav_wishes">Good Wishes</span></a>
         <a href="#gallery" class="drawer-nav-link" data-nav-target="gallery"><i class="fas fa-images"></i> <span data-i18n="nav_gallery">Gallery</span></a>
         <a href="#blog" class="drawer-nav-link" data-nav-target="blog"><i class="fas fa-newspaper"></i> <span data-i18n="nav_blog">Blog & News</span></a>

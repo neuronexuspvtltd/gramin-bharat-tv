@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Update active state in navbars & drawer
     navLinks.forEach(link => {
       const target = link.getAttribute("data-nav-target");
-      if (target === viewId) {
+      if (target === viewId || ((viewId === "works" || viewId === "mulakhati") && target === "works")) {
         link.classList.add("active");
       } else {
         link.classList.remove("active");
@@ -1611,6 +1611,40 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
     `).join("");
+  }
+
+  // ==========================================
+  // RENDER SARPANCH MULAKHATI VIDEOS
+  // ==========================================
+  const mulakhatiVideoGrid = document.getElementById("mulakhati-video-grid");
+  if (mulakhatiVideoGrid && data.sarpanchMulakhati) {
+    mulakhatiVideoGrid.innerHTML = data.sarpanchMulakhati.map(video => {
+      let playerHtml = "";
+      if (video.videoPath) {
+        playerHtml = `
+          <video controls preload="metadata" style="width: 100%; height: 210px; object-fit: cover; background: #000; border-radius: 12px 12px 0 0;">
+            <source src="${video.videoPath}" type="video/mp4">
+            आपला ब्राउझर या व्हिडिओला सपोर्ट करत नाही.
+          </video>
+        `;
+      } else {
+        playerHtml = `
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/${video.videoId}?controls=1" title="${video.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+        `;
+      }
+
+      return `
+        <div class="video-archive-card">
+          <div class="video-thumb" style="height: 210px;">
+            ${playerHtml}
+          </div>
+          <div class="video-info">
+            <h3 class="video-title">${video.title}</h3>
+            <p class="video-desc">${video.description}</p>
+          </div>
+        </div>
+      `;
+    }).join("");
   }
 
   // ==========================================

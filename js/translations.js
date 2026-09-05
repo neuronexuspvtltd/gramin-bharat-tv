@@ -10,6 +10,8 @@ const GBTV_TRANSLATIONS = {
     nav_home: "मुख्य पृष्ठ",
     nav_about: "आमच्याबद्दल",
     nav_works: "आमचे कार्य",
+    nav_janjagruti: "मिशन जनजागृती",
+    nav_mulakhati: "सरपंच मुलाखती",
     nav_wishes: "शुभेच्छा",
     nav_gallery: "गॅलरी",
     nav_blog: "ब्लॉग व बातम्या",
@@ -123,6 +125,11 @@ const GBTV_TRANSLATIONS = {
     works_page_subtitle: "आमचे कार्य",
     works_page_title: "मिशन <span class='gradient-text'>जनजागृती</span>",
     works_page_tagline: "शेतकरी आणि गावकऱ्यांसाठी विशेष वृत्त संकलन करणारे गाव पातळीवरील डिजिटल चॅनल.",
+
+    // Sarpanch Mulakhati Dedicated Page
+    mulakhati_page_subtitle: "विशेष मुलाखत मालिका",
+    mulakhati_page_title: "सरपंच <span class='gradient-text'>मुलाखती</span>",
+    mulakhati_page_tagline: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचांच्या थेट मुलाखती व कार्यगौरव.",
 
     // Namdar Maharashtracha Dedicated Page
     namdar_page_subtitle: "श्रुती फिल्म्स प्रस्तुत",
@@ -243,6 +250,8 @@ const GBTV_TRANSLATIONS = {
     nav_home: "Home",
     nav_about: "About Us",
     nav_works: "Our Works",
+    nav_janjagruti: "Mission Janjagruti",
+    nav_mulakhati: "Sarpanch Mulakhati",
     nav_wishes: "Good Wishes",
     nav_gallery: "Gallery",
     nav_blog: "Blog & News",
@@ -356,6 +365,11 @@ const GBTV_TRANSLATIONS = {
     works_page_subtitle: "OUR WORKS",
     works_page_title: "Mission <span class='gradient-text'>Janjagruti</span>",
     works_page_tagline: "The starting of a web channel which reaches to the very villages to cover news specially for farmers and villagers.",
+
+    // Sarpanch Mulakhati Dedicated Page
+    mulakhati_page_subtitle: "INTERVIEW SERIES",
+    mulakhati_page_title: "Sarpanch <span class='gradient-text'>Mulakhati</span>",
+    mulakhati_page_tagline: "Exclusive interviews and success stories of visionary Sarpanchs across Maharashtra.",
 
     // Namdar Maharashtracha Dedicated Page
     namdar_page_subtitle: "SHRUTI FILMS PRASTUT",

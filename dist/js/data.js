@@ -252,6 +252,93 @@ const GBTV_DATA = {
     }
   ],
 
+  sarpanchMulakhati: [
+    {
+      id: "mulakhati-1",
+      title: "सरपंच मुलाखत - भाग १ (Sarpanch Interview Ep 1)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video1.mp4"
+    },
+    {
+      id: "mulakhati-2",
+      title: "सरपंच मुलाखत - भाग २ (Sarpanch Interview Ep 2)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video2.mp4"
+    },
+    {
+      id: "mulakhati-3",
+      title: "सरपंच मुलाखत - भाग ३ (Sarpanch Interview Ep 3)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video3.mp4"
+    },
+    {
+      id: "mulakhati-4",
+      title: "सरपंच मुलाखत - भाग ४ (Sarpanch Interview Ep 4)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video4.mp4"
+    },
+    {
+      id: "mulakhati-5",
+      title: "सरपंच मुलाखत - भाग ५ (Sarpanch Interview Ep 5)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video5.mp4"
+    },
+    {
+      id: "mulakhati-6",
+      title: "सरपंच मुलाखत - भाग ६ (Sarpanch Interview Ep 6)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video6.mp4"
+    },
+    {
+      id: "mulakhati-7",
+      title: "सरपंच मुलाखत - भाग ७ (Sarpanch Interview Ep 7)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video7.mp4"
+    },
+    {
+      id: "mulakhati-8",
+      title: "सरपंच मुलाखत - भाग ८ (Sarpanch Interview Ep 8)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video8.mp4"
+    },
+    {
+      id: "mulakhati-9",
+      title: "सरपंच मुलाखत - भाग ९ (Sarpanch Interview Ep 9)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video9.mp4"
+    },
+    {
+      id: "mulakhati-10",
+      title: "सरपंच मुलाखत - भाग १० (Sarpanch Interview Ep 10)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video10.mp4"
+    },
+    {
+      id: "mulakhati-11",
+      title: "सरपंच मुलाखत - भाग ११ (Sarpanch Interview Ep 11)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video11.mp4"
+    },
+    {
+      id: "mulakhati-12",
+      title: "सरपंच मुलाखत - भाग १२ (Sarpanch Interview Ep 12)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video12.mp4"
+    },
+    {
+      id: "mulakhati-13",
+      title: "सरपंच मुलाखत - भाग १३ (Sarpanch Interview Ep 13)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video13.mp4"
+    },
+    {
+      id: "mulakhati-14",
+      title: "सरपंच मुलाखत - भाग १४ (Sarpanch Interview Ep 14)",
+      description: "महाराष्ट्रातील धडपडणाऱ्या आदर्श सरपंचाची विशेष रोखठोक मुलाखत व ग्रामविकास यशोगाथा.",
+      videoPath: "videos/video14.mp4"
+    }
+  ],
+
   testimonials: [
     {
       id: 1,

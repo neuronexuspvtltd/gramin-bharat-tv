@@ -17,7 +17,10 @@ const MIME_TYPES = {
   ".ico": "image/x-icon",
   ".woff": "font/woff",
   ".woff2": "font/woff2",
-  ".ttf": "font/ttf"
+  ".ttf": "font/ttf",
+  ".mp4": "video/mp4",
+  ".webm": "video/webm",
+  ".ogv": "video/ogg"
 };
 
 const server = http.createServer((req, res) => {
@@ -37,7 +40,26 @@ const server = http.createServer((req, res) => {
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || "application/octet-stream";
 
-    res.writeHead(200, { "Content-Type": contentType });
+    // Handle HTTP Range Requests for HTML5 video seeking (.mp4, .webm)
+    const range = req.headers.range;
+    if (range && (ext === ".mp4" || ext === ".webm" || ext === ".ogv")) {
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : stats.size - 1;
+      const chunksize = (end - start) + 1;
+      const file = fs.createReadStream(filePath, { start, end });
+
+      res.writeHead(206, {
+        "Content-Range": `bytes ${start}-${end}/${stats.size}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": chunksize,
+        "Content-Type": contentType
+      });
+      file.pipe(res);
+      return;
+    }
+
+    res.writeHead(200, { "Content-Type": contentType, "Content-Length": stats.size });
     fs.createReadStream(filePath).pipe(res);
   });
 });
