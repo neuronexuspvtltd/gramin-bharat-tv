@@ -1622,7 +1622,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let playerHtml = "";
       if (video.videoPath) {
         playerHtml = `
-          <video controls playsinline webkit-playsinline preload="metadata" style="width: 100%; height: 210px; object-fit: cover; background: #000; border-radius: 12px 12px 0 0;">
+          <video controls playsinline webkit-playsinline preload="metadata" class="archive-video-player">
             <source src="${video.videoPath}" type="video/mp4">
             <p style="padding: 10px; color: #fff; font-size: 0.8rem;">आपला ब्राउझर या व्हिडिओला सपोर्ट करत नाही.</p>
           </video>
@@ -1635,7 +1635,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       return `
         <div class="video-archive-card">
-          <div class="video-thumb" style="height: 210px;">
+          <div class="video-thumb">
             ${playerHtml}
           </div>
           <div class="video-info">
