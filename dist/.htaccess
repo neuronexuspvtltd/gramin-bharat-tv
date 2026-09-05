@@ -1,5 +1,5 @@
 # =========================================================================
-# Gramin Bharat TV - Apache Server Configuration (.htaccess)
+# Gramin Bharat TV - Apache / Hostinger Server Configuration (.htaccess)
 # =========================================================================
 
 # 1. Enable Rewrite Engine
@@ -20,7 +20,7 @@
   RewriteRule ^ index.html [L]
 </IfModule>
 
-# 2. Force Default Charset to UTF-8
+# 2. Force Default Charset UTF-8 & Video MIME Types (Essential for iOS / Safari)
 AddDefaultCharset UTF-8
 <IfModule mod_mime.c>
   AddCharset UTF-8 .html .css .js .xml .json .rss
@@ -28,6 +28,9 @@ AddDefaultCharset UTF-8
   AddType application/json .json
   AddType font/woff2 .woff2
   AddType font/woff .woff
+  AddType video/mp4 .mp4 .m4v
+  AddType video/webm .webm
+  AddType video/ogg .ogv
 </IfModule>
 
 # 3. Gzip / Deflate Compression (Performance Optimization)
@@ -60,16 +63,22 @@ AddDefaultCharset UTF-8
   ExpiresByType image/webp "access plus 1 year"
   ExpiresByType image/x-icon "access plus 1 year"
 
+  # Videos
+  ExpiresByType video/mp4 "access plus 1 month"
+  ExpiresByType video/webm "access plus 1 month"
+
   # Web Fonts
   ExpiresByType font/woff2 "access plus 1 year"
   ExpiresByType font/woff "access plus 1 year"
   ExpiresByType application/font-woff "access plus 1 year"
 </IfModule>
 
-# 5. Essential Security Headers
+# 5. Essential Security & Video Streaming Headers (Byte Range for iOS / Safari)
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
   Header set X-Frame-Options "SAMEORIGIN"
   Header set X-XSS-Protection "1; mode=block"
   Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Accept-Ranges "bytes"
+  Header set Access-Control-Allow-Origin "*"
 </IfModule>
