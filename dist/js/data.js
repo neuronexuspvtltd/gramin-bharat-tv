@@ -366,33 +366,43 @@ const GBTV_DATA = {
   goodWishes: [
     {
       id: 1,
+      dignitary: "मा. ना. देवेंद्र फडणवीस",
+      dignitaryEn: "Hon. Shri Devendra Fadnavis",
+      designation: "Deputy Chief Minister, Government of Maharashtra",
+      tag: "🏛️ Govt. of Maharashtra Official Letter",
+      quote: "नागपूर येथील श्रुती फिल्म्स ‘नामदार महाराष्ट्राचा’ हा महाराष्ट्रातील ग्रामविकासात उल्लेखनीय योगदान देणाऱ्या सरपंच बांधव-भगिनींच्या कार्याचा गौरव करणारा कार्यक्रम साकारला जात असल्याचे समजून आनंद झाला. ‘नामदार महाराष्ट्र’ कार्यक्रमास मनःपूर्वक शुभेच्छा!",
+      date: "Mantralaya, Mumbai",
+      image: "assets/letter_devendra_fadnavis.jpg"
+    },
+    {
+      id: 2,
       dignitary: "मा. ना. नितीन गडकरी",
       dignitaryEn: "Hon. Shri Nitin Gadkari",
       designation: "Union Minister of Road Transport & Highways, Govt. of India",
       tag: "🏛️ Govt. of India Official Letter",
-      quote: "महाराष्ट्रातील सरपंचांसाठी 'नामदार महाराष्ट्राचा' या शो च्या निर्मितीबद्दल हार्दिक आनंद. या उपक्रमाच्या यशस्वीतेसाठी मनःपूर्वक शुभेच्छा.",
+      quote: "माझ्या नागपूर लोकसभा मतदारसंघातील रहिवासी तसेच लेखक-दिग्दर्शक-निर्माता श्री. विलास गाडगे यांच्या श्रुती फिल्म्सच्या वतीने महाराष्ट्रातील सरपंचांसाठी 'नामदार महाराष्ट्राचा' या शो ची निर्मिती केली जात असल्याचे कळल्यावर अतिशय आनंद झाला. या उपक्रमाच्या यशस्वीतेसाठी मनःपूर्वक शुभेच्छा.",
       date: "New Delhi",
-      image: "https://graminbharat-tv.com/wp-content/uploads/2026/05/WhatsApp-Image-2025-12-30-at-12.55.01-PM-2.jpeg"
-    },
-    {
-      id: 2,
-      dignitary: "मा. ना. चंद्रशेखर बावनकुळे",
-      dignitaryEn: "Hon. Shri Chandrashekhar Bawankule",
-      designation: "Minister of Revenue & Parliamentary Affairs, Govt. of Maharashtra",
-      tag: "🏛️ Govt. of Maharashtra Official Letter",
-      quote: "ग्रामविकासातील सरपंचांच्या कार्याचा गौरव करणाऱ्या 'नामदार महाराष्ट्र' या अभिनव कार्यक्रमास माझ्या मनःपूर्वक हार्दिक शुभेच्छा.",
-      date: "Mantralaya, Mumbai",
-      image: "https://graminbharat-tv.com/wp-content/uploads/2026/05/WhatsApp-Image-2026-05-02-at-1.08.33-AM.jpeg"
+      image: "assets/letter_nitin_gadkari.jpg"
     },
     {
       id: 3,
+      dignitary: "मा. ना. चंद्रशेखर बावनकुळे",
+      dignitaryEn: "Hon. Shri Chandrashekhar Bawankule",
+      designation: "Minister of Revenue, Government of Maharashtra",
+      tag: "🏛️ Govt. of Maharashtra Official Letter",
+      quote: "श्रुती फिल्म्स नागपूर यांचे वतीने 'नामदार महाराष्ट्र' हा महाराष्ट्रातील ग्राम विकासाच्या उल्लेखनीय कार्याचा गौरव करणारा कार्यक्रम साकारला जात आहे हे समजून मनस्वी आनंद झाला. 'नामदार महाराष्ट्र' या कार्यक्रमास माझ्या हार्दिक शुभेच्छा.",
+      date: "Mantralaya, Mumbai",
+      image: "assets/letter_chandrashekhar_bawankule.jpg"
+    },
+    {
+      id: 4,
       dignitary: "मा. ना. जयकुमार गोरे",
       dignitaryEn: "Hon. Shri Jaykumar Gore",
       designation: "Minister of Rural Development & Panchayat Raj, Govt. of Maharashtra",
       tag: "🏛️ Rural Development Ministry",
-      quote: "पंचायतराज व्यवस्थेला बळकटी देणाऱ्या आणि आदर्श सरपंचांचा गौरव करणाऱ्या 'नामदार महाराष्ट्र' या उपक्रमास खूप खूप शुभेच्छा!",
+      quote: "ग्रामविकासाच्या यशामध्ये महत्वाची भूमिका बजावणाऱ्या सरपंच बांधव-भगिनींच्या कार्याचा गौरव करणारा कार्यक्रम 'नामदार महाराष्ट्राचा' हा साकारला जात आहे ही निश्चितच आनंदाची बाब आहे. 'नामदार महाराष्ट्र' कार्यक्रमाच्या यशस्वीतेसाठी खूप शुभेच्छा आणि या स्तुत्य उपक्रमासाठी खूप अभिनंदन!",
       date: "Mantralaya, Mumbai",
-      image: "https://graminbharat-tv.com/wp-content/uploads/2026/05/fdhfd.jpg"
+      image: "assets/letter_jaykumar_gore.jpg"
     }
   ],
 
@@ -515,14 +525,22 @@ const GBTV_DATA = {
 // ==========================================================================
 // DYNAMIC CMS STORAGE ENGINE (SYNC WITH LOCALSTORAGE)
 // ==========================================================================
-const CMS_STORAGE_KEY = "GBTV_CMS_DATA_STORE_V1";
+const CMS_STORAGE_KEY = "GBTV_CMS_DATA_STORE_V2";
 
 function getCmsData() {
   try {
-    const raw = localStorage.getItem(CMS_STORAGE_KEY);
+    let raw = localStorage.getItem(CMS_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(CMS_STORAGE_KEY, JSON.stringify(GBTV_DATA));
-      return JSON.parse(JSON.stringify(GBTV_DATA));
+      const oldRaw = localStorage.getItem("GBTV_CMS_DATA_STORE_V1");
+      let initialData = GBTV_DATA;
+      if (oldRaw) {
+        try {
+          const oldData = JSON.parse(oldRaw);
+          initialData = { ...GBTV_DATA, ...oldData, goodWishes: GBTV_DATA.goodWishes };
+        } catch (e) {}
+      }
+      localStorage.setItem(CMS_STORAGE_KEY, JSON.stringify(initialData));
+      return JSON.parse(JSON.stringify(initialData));
     }
     const parsed = JSON.parse(raw);
     return { ...GBTV_DATA, ...parsed };

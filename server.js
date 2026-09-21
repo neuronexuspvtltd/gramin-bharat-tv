@@ -64,10 +64,26 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`\n==================================================`);
-  console.log(`🚀 Gramin Bharat TV Server running locally!`);
-  console.log(`👉 Main Site:   http://localhost:${PORT}/`);
-  console.log(`👉 Admin Panel:  http://localhost:${PORT}/admin.html`);
-  console.log(`==================================================\n`);
+let currentPort = parseInt(PORT, 10);
+
+function startServer(port) {
+  server.listen(port, () => {
+    console.log(`\n==================================================`);
+    console.log(`🚀 Gramin Bharat TV Server running locally!`);
+    console.log(`👉 Main Site:   http://localhost:${port}/`);
+    console.log(`👉 Admin Panel:  http://localhost:${port}/admin.html`);
+    console.log(`==================================================\n`);
+  });
+}
+
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.log(`Port ${currentPort} is in use, trying port ${currentPort + 1}...`);
+    currentPort += 1;
+    startServer(currentPort);
+  } else {
+    console.error(err);
+  }
 });
+
+startServer(currentPort);

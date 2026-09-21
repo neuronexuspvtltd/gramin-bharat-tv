@@ -1712,28 +1712,77 @@ document.addEventListener("DOMContentLoaded", () => {
       lightbox.className = "letter-lightbox-modal";
       lightbox.innerHTML = `
         <div class="lightbox-backdrop"></div>
-        <div class="lightbox-dialog">
+        <div class="lightbox-dialog" id="lightbox-dialog-el">
           <div class="lightbox-header">
             <h4 id="lightbox-title-el">Official Letter</h4>
-            <button class="lightbox-close-btn" aria-label="Close"><i class="fas fa-times"></i></button>
+            <button class="lightbox-close-btn" aria-label="Close" title="Close"><i class="fas fa-times"></i></button>
           </div>
-          <div class="lightbox-body">
-            <img id="lightbox-img-el" src="" alt="Letter">
+          <div class="lightbox-body" id="lightbox-body-el">
+            <img id="lightbox-img-el" src="" alt="Official Letter">
           </div>
         </div>
       `;
       document.body.appendChild(lightbox);
 
-      lightbox.querySelector(".lightbox-close-btn").addEventListener("click", () => {
+      const closeLightbox = () => {
         lightbox.classList.remove("active");
+        document.body.style.overflow = "";
+      };
+
+      lightbox.querySelector(".lightbox-close-btn").addEventListener("click", closeLightbox);
+      lightbox.querySelector(".lightbox-backdrop").addEventListener("click", closeLightbox);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && lightbox.classList.contains("active")) {
+          closeLightbox();
+        }
       });
-      lightbox.querySelector(".lightbox-backdrop").addEventListener("click", () => {
-        lightbox.classList.remove("active");
+
+      window.addEventListener("resize", () => {
+        if (lightbox.classList.contains("active")) {
+          adjustLightboxSize();
+        }
       });
     }
 
-    document.getElementById("lightbox-img-el").src = src;
-    document.getElementById("lightbox-title-el").innerText = title || "Official Appreciation Letter";
+    const img = document.getElementById("lightbox-img-el");
+    const dialog = document.getElementById("lightbox-dialog-el");
+    const titleEl = document.getElementById("lightbox-title-el");
+
+    titleEl.innerText = title || "Official Appreciation Letter";
+    img.src = src;
+
+    function adjustLightboxSize() {
+      if (!img.naturalWidth || !img.naturalHeight) return;
+      const vh = window.innerHeight;
+      const vw = window.innerWidth;
+
+      const overheadH = 84;
+      const maxH = Math.max(vh * 0.88 - overheadH, 220);
+      const maxW = Math.min(vw * 0.92, 680);
+
+      const aspect = img.naturalWidth / img.naturalHeight;
+      let targetH = maxH;
+      let targetW = targetH * aspect;
+
+      if (targetW > maxW) {
+        targetW = maxW;
+        targetH = targetW / aspect;
+      }
+
+      const bodyPadX = 28;
+      dialog.style.width = Math.round(targetW + bodyPadX) + "px";
+      dialog.style.maxWidth = "94vw";
+      img.style.maxHeight = Math.round(targetH) + "px";
+      img.style.width = "auto";
+    }
+
+    if (img.complete && img.naturalWidth > 0) {
+      adjustLightboxSize();
+    } else {
+      img.onload = adjustLightboxSize;
+    }
+
+    document.body.style.overflow = "hidden";
     lightbox.classList.add("active");
   }
 

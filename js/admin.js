@@ -725,16 +725,24 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
     } else if (sectionKey === "wishes") {
-      item = itemId ? data.goodWishes.find(w => w.id == itemId) : { dignitary: "मान्यवरांचे नाव", designation: "मंत्रालय, महाराष्ट्र शासन", tag: "🏛️ Official Letter", quote: "नामदार महाराष्ट्र या उपक्रमास खूप खूप शुभेच्छा!", image: "https://graminbharat-tv.com/wp-content/uploads/2026/05/fdhfd.jpg" };
+      item = itemId ? data.goodWishes.find(w => w.id == itemId) : { dignitary: "मान्यवरांचे नाव", dignitaryEn: "Hon. Dignitary Name", designation: "मंत्रालय, महाराष्ट्र शासन", tag: "🏛️ Official Letter", quote: "नामदार महाराष्ट्र या उपक्रमास खूप खूप शुभेच्छा!", date: "Mumbai", image: "assets/letter_devendra_fadnavis.jpg" };
       titleText = itemId ? "Edit Good Wishes Letter" : "Add Good Wishes Letter";
       fieldsHtml = `
         <div class="admin-form-group">
-          <label class="admin-label">Dignitary Full Name</label>
+          <label class="admin-label">Dignitary Full Name (Marathi)</label>
           <input type="text" id="crud-wishes-name" class="admin-input" value="${item.dignitary || ''}" required>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-label">Dignitary English Name</label>
+          <input type="text" id="crud-wishes-name-en" class="admin-input" value="${item.dignitaryEn || ''}">
         </div>
         <div class="admin-form-group">
           <label class="admin-label">Official Tag / Seal</label>
           <input type="text" id="crud-wishes-tag" class="admin-input" value="${item.tag || '🏛️ Official Letter'}">
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-label">Date / Location</label>
+          <input type="text" id="crud-wishes-date" class="admin-input" value="${item.date || ''}">
         </div>
         <div class="admin-form-group form-group-full">
           <label class="admin-label">Designation / Title</label>
@@ -859,9 +867,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const wishData = {
           id: isNew ? Date.now() : currentCrudItemId,
           dignitary: document.getElementById("crud-wishes-name").value.trim(),
+          dignitaryEn: (document.getElementById("crud-wishes-name-en") ? document.getElementById("crud-wishes-name-en").value.trim() : ""),
           tag: document.getElementById("crud-wishes-tag").value.trim(),
           designation: document.getElementById("crud-wishes-desig").value.trim(),
-          image: document.getElementById("crud-wishes-img").value.trim() || "https://graminbharat-tv.com/wp-content/uploads/2026/05/fdhfd.jpg",
+          date: (document.getElementById("crud-wishes-date") ? document.getElementById("crud-wishes-date").value.trim() : "Mantralaya, Mumbai"),
+          image: document.getElementById("crud-wishes-img").value.trim() || "assets/letter_devendra_fadnavis.jpg",
           quote: document.getElementById("crud-wishes-quote").value.trim()
         };
         if (isNew) data.goodWishes.push(wishData);
