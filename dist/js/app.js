@@ -1789,18 +1789,32 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================
   // RENDER FULL GALLERY PAGE
   // ==========================================
-  const fullGalleryGrid = document.getElementById("full-gallery-grid");
-  if (fullGalleryGrid && data.galleryImages) {
-    fullGalleryGrid.innerHTML = data.galleryImages.map(item => `
-      <div class="showcase-poster-card" style="aspect-ratio: 2 / 3;">
-        <img src="${item.image}" alt="${item.title}" loading="lazy">
+  function renderFullGallery() {
+    const fullGalleryGrid = document.getElementById("full-gallery-grid");
+    if (!fullGalleryGrid || !data.galleryImages) return;
+    const lang = window.gbtvLang ? window.gbtvLang.getLang() : "mr";
+    fullGalleryGrid.innerHTML = data.galleryImages.map(item => {
+      const title = (lang === "mr" && item.title_mr) ? item.title_mr : (lang === "en" && item.title_en ? item.title_en : item.title);
+      const category = (lang === "mr" && item.category_mr) ? item.category_mr : item.category;
+      return `
+      <div class="showcase-poster-card" style="aspect-ratio: 2 / 3; cursor: pointer;" data-lightbox-src="${item.image}" data-lightbox-title="${title}">
+        <img src="${item.image}" alt="${title}" loading="lazy">
         <div class="poster-overlay" style="opacity: 1; background: linear-gradient(180deg, transparent 50%, rgba(6,9,19,0.95) 100%);">
-          <div class="badge-tag" style="margin-bottom: 6px;">${item.category}</div>
-          <h4>${item.title}</h4>
+          <div class="badge-tag" style="margin-bottom: 6px;">${category}</div>
+          <h4>${title}</h4>
         </div>
       </div>
-    `).join("");
+    `}).join("");
+
+    fullGalleryGrid.querySelectorAll("[data-lightbox-src]").forEach(card => {
+      card.addEventListener("click", () => {
+        const src = card.getAttribute("data-lightbox-src");
+        const title = card.getAttribute("data-lightbox-title");
+        openImageLightbox(src, title);
+      });
+    });
   }
+  renderFullGallery();
 
   // ==========================================
   // STICKY HEADER & SCROLL BEHAVIOR

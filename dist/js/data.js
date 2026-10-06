@@ -409,36 +409,72 @@ const GBTV_DATA = {
   galleryImages: [
     {
       id: 1,
+      title: "आपल्या कार्याची दखल... आपल्या गावाचा सन्मान! (माहिती पत्रक)",
+      title_mr: "आपल्या कार्याची दखल... आपल्या गावाचा सन्मान! (माहिती पत्रक)",
+      title_en: "Namdar Maharashtracha Official Program Information Poster",
+      category: "Info Posters",
+      category_mr: "माहिती पत्रक",
+      image: "assets/poster_namdar_info1.jpg"
+    },
+    {
+      id: 2,
+      title: "प्रतिनिधींसाठी मार्गदर्शक प्रश्न – सरपंचांची मुलाखत १० मुख्य प्रश्न",
+      title_mr: "प्रतिनिधींसाठी मार्गदर्शक प्रश्न – सरपंचांची मुलाखत १० मुख्य प्रश्न",
+      title_en: "Interview Guide & 10 Core Questions for Sarpanchs",
+      category: "Info Posters",
+      category_mr: "मार्गदर्शक प्रश्न",
+      image: "assets/poster_interview_guide.jpg"
+    },
+    {
+      id: 3,
+      title: "सर्व सरपंच, उपसरपंच बंधू-भगिनींना सप्रेम नमस्कार (चित्रीकरण मुद्दे)",
+      title_mr: "सर्व सरपंच, उपसरपंच बंधू-भगिनींना सप्रेम नमस्कार (चित्रीकरण मुद्दे)",
+      title_en: "Invitation & Village Shoot Framework Poster",
+      category: "Info Posters",
+      category_mr: "माहिती पत्रक",
+      image: "assets/poster_namdar_info2.jpg"
+    },
+    {
+      id: 4,
+      title: "विशेष उपक्रमांतर्गत ग्रामपातळीवर आवश्यक सहकार्य पत्र",
+      title_mr: "विशेष उपक्रमांतर्गत ग्रामपातळीवर आवश्यक सहकार्य पत्र",
+      title_en: "Block Development Officer (BDO) Cooperation Letter",
+      category: "Official Letters",
+      category_mr: "सहकार्य पत्र",
+      image: "assets/letter_bd_cooperation.jpg"
+    },
+    {
+      id: 5,
       title: "Namdar Maharashtracha Launch Poster",
       category: "Posters",
       image: "https://graminbharat-tv.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-13-at-5.32.51-PM.jpeg"
     },
     {
-      id: 2,
+      id: 6,
       title: "Gram Panchayat Leadership Series",
       category: "Posters",
       image: "https://graminbharat-tv.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-13-at-5.32.50-PM-1.jpeg"
     },
     {
-      id: 3,
+      id: 7,
       title: "Sarpanch Sanman Special Edition",
       category: "Posters",
       image: "https://graminbharat-tv.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-13-at-5.32.50-PM-2.jpeg"
     },
     {
-      id: 4,
+      id: 8,
       title: "Shruti Films Presentation Artwork",
       category: "Posters",
       image: "https://graminbharat-tv.com/wp-content/uploads/2026/04/WhatsApp-Image-2026-04-13-at-5.32.50-PM.jpeg"
     },
     {
-      id: 5,
+      id: 9,
       title: "Director Vilas Gadge on Production Set",
       category: "Behind the Scenes",
       image: "https://graminbharat-tv.com/wp-content/uploads/2026/01/sdgdsg.jpg"
     },
     {
-      id: 6,
+      id: 10,
       title: "Village Community Gathering & Screening",
       category: "Events",
       image: "https://graminbharat-tv.com/wp-content/uploads/2026/01/sfsd.jpg"
